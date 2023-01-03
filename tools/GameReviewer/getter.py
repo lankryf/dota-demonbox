@@ -1,4 +1,4 @@
-# Copyright 2022 LankryF
+# Copyright 2023 LankryF
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 from requests import get
 from tools.stringwiz import stringsInside
+from tools.threadbooster import ThreadBooster
 
 def gameDataMask() -> dict:
     return {
@@ -24,29 +25,28 @@ def gameDataMask() -> dict:
     }
 
 
-def getDataFromEscorenews(pageNumber:int=1):
 
+class Escorenews(ThreadBooster):
+    
+    @staticmethod
+    def getInputs(pageNumber:int) -> list[str]:
+        return stringsInside(get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text, '<a class="article v_gl582" href="', '">')
+    
 
-
-
-    for games in stringsInside(get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text, '<a class="article v_gl582" href="', '">'):
-        
-        page = get("https://escorenews.com/" + games).text
+    @staticmethod
+    def getResult(multithreads, gameLinkAddition:str):
+        page = get("https://escorenews.com/" + gameLinkAddition).text
+        # print("https://escorenews.com/" + games)
         result = gameDataMask()
 
-        #for test
-        with open("a.txt", "w", encoding="utf-8") as f:
-            f.write(page)
-
+        # #for test
+        # with open("a.txt", "w", encoding="utf-8") as f:
+        #     f.write(page)
 
         #getting drafts
         for side in range(2):
             for game in stringsInside(page, f'<div class="heroes t{side+1}">', '</div>'):
-                result["drafts"][side].append(stringsInside(game, '<picture class="hero tt" title="', '">'))
-        
-
-
-
+                result["drafts"][side].append(stringsInside(game, '<picture class="hero tt" title="', '">', lambda x: x.lower()))
 
 
         #getting scores
@@ -55,11 +55,16 @@ def getDataFromEscorenews(pageNumber:int=1):
             stringsInside(page, '<span rel="t2" class="team red">', '</span>')
             ]
         
+        # skip if it is empty match
+        if not len(scores[0]):
+            return
+
         for score in scores[0]:
             if score[:3] == "<u>":
                 result["wins"].append(0)
             else:
                 result["wins"].append(1)
+
 
         #remove tage from team name
         def removeTag(text:str) -> str:
@@ -72,8 +77,10 @@ def getDataFromEscorenews(pageNumber:int=1):
         for score in scores:
             result["teams"].append(removeTag(score[0]))
 
+
         #postprocessing
         for scoreNumber in range(1, len(scores[0])):
+
             #replace incorrect team names
             teams = [None, None]
             for scoresNumber in range(len(scores)):
@@ -89,9 +96,4 @@ def getDataFromEscorenews(pageNumber:int=1):
                 result["wins"][scoreNumber] = 1 - result["wins"][scoreNumber]
                 result["drafts"][0][scoreNumber], result["drafts"][1][scoreNumber] = result["drafts"][1][scoreNumber], result["drafts"][0][scoreNumber]
 
-
-        print(result)
-        input()
-    
-    # with open("a.txt", "w", encoding="utf-8") as f:
-    #     f.write(page)
+        multithreads.addResult(result)
