@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-class Game:
+class Match:
     def __init__(self, gamedata:dict) -> None:
         self.__gamedata = gamedata
 

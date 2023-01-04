@@ -17,13 +17,14 @@ from requests import get
 from tools.stringwiz import stringsInside
 from tools.threadbooster import ThreadBooster
 
-def gameDataMask() -> dict:
+
+def matchDataMask(link:str) -> dict:
     return {
+        "link": link,
         "teams": [],
         "drafts": [[], []],
         "wins": []
     }
-
 
 
 class Escorenews(ThreadBooster):
@@ -34,10 +35,9 @@ class Escorenews(ThreadBooster):
     
 
     @staticmethod
-    def getResult(multithreads, gameLinkAddition:str):
-        page = get("https://escorenews.com/" + gameLinkAddition).text
-        # print("https://escorenews.com/" + games)
-        result = gameDataMask()
+    def getResult(multithreads, matchLinkAddition:str):
+        page = get("https://escorenews.com/" + matchLinkAddition).text
+        result = matchDataMask(matchLinkAddition)
 
         # #for test
         # with open("a.txt", "w", encoding="utf-8") as f:

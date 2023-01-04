@@ -29,6 +29,13 @@ migrations = [
 );
 ''',
 
+'''CREATE TABLE "matches" (
+	"match_id"	INTEGER NOT NULL UNIQUE,
+	"link"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("match_id" AUTOINCREMENT)
+);
+''',
+
 '''CREATE TABLE "games" (
 	"id"	INTEGER NOT NULL UNIQUE,
 	"team1_id"	INTEGER NOT NULL,

@@ -14,20 +14,55 @@
 
 
 import sqlite3
-from database.models.Characters import Characters
+from datetime import datetime
+
 from database.migrations import migrations
 
-class Databar(Characters):
-    def __init__(self, path="data.db"):
-        self._conn = sqlite3.connect(path)
-        self._cur = self._conn.cursor()
+from database.models.Characters import *
+from database.models.Teams import *
+from database.models.Matches import *
+
+
+class Databar(Characters, Teams, Matches):
+    def __init__(self, path, backupsFolder="database/backups"):
+        self.__path = path
+        self.__backupsFolder = backupsFolder
+        
+        self.__initConnectionAndCursor()
     
+    
+    def __initConnectionAndCursor(self):
+        self.__conn = sqlite3.connect(self.__path)
+        self.__cur = self.__conn.cursor()
+    
+    
+    def backup(self) -> None:
+        """Backups database to backupsFolder with timestamp
+        """
+        self.__conn.commit()
+        backup = sqlite3.connect(self.__backupsFolder + datetime.now().strftime("/%d-%m-%y_%H-%M-%S.db"))
+        self.__conn.backup(backup)
+        backup.close()
+    
+    
+    def clearWithBackup(self):
+        self.backup()
+        self.__conn.close()
+        with open(self.__path, "w") as _:
+            pass
+        self.__initConnectionAndCursor()
+        self.migrate()
+        
+
+    @property
+    def cur(self):
+        return self.__cur
+
+
     def migrate(self):
         for migration in migrations:
-            self._cur.execute(migration)
+            self.__cur.execute(migration)
     
     def close(self):
-        self._conn.commit()
-        self._conn.close()
-    
-    
+        self.__conn.commit()
+        self.__conn.close()

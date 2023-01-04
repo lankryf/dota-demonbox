@@ -13,24 +13,23 @@
 # limitations under the License.
 
 
-class Characters():
-    def characterExists(self, name:str) -> bool:
-        """Checks for character by name
+class Teams:
+    def teamExists(self, name:str) -> bool:
+        """Checks for team by name
 
         Args:
-            name (str): character's name
+            name (str): team's name
 
         Returns:
             bool: True if exists, False if not
         """
-        self.cur.execute("SELECT id FROM characters WHERE name=? LIMIT 1", (name,))
+        self.cur.execute("SELECT id FROM teams WHERE name=? LIMIT 1", (name,))
         return bool(self.cur.fetchall())
     
-    
-    def characterAdd(self, name:str) -> None:
-        """Add character to the database
+    def teamAdd(self, name:str) -> None:
+        """Add team to the database
 
         Args:
-            name (str): character's name
+            name (str): team's name
         """
-        self.cur.execute("INSERT INTO characters(name) VALUES(?)", (name,))
+        self.cur.execute("INSERT INTO teams(name) VALUES(?)", (name,))
