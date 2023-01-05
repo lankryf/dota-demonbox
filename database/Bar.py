@@ -46,6 +46,8 @@ class Databar(Characters, Teams, Matches):
     
     
     def clearWithBackup(self):
+        """Generates backup, clears database, migrate tables
+        """
         self.backup()
         self.__conn.close()
         with open(self.__path, "w") as _:
@@ -60,9 +62,13 @@ class Databar(Characters, Teams, Matches):
 
 
     def migrate(self):
+        """Migrates all from migrations.py
+        """
         for migration in migrations:
             self.__cur.execute(migration)
     
     def close(self):
+        """Commit and close
+        """
         self.__conn.commit()
         self.__conn.close()

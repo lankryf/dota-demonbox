@@ -12,43 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-migrations = [
+migrations = (
 '''CREATE TABLE "characters" (
-	"id"	INTEGER NOT NULL UNIQUE,
+	"character_id"	INTEGER NOT NULL UNIQUE,
 	"name"	TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("character_id" AUTOINCREMENT)
 );
 ''',
 
 '''CREATE TABLE "drafts" (
-	"id"	INTEGER NOT NULL UNIQUE,
+	"draft_id"	INTEGER NOT NULL UNIQUE,
 	"game_id"	INTEGER NOT NULL,
 	"team"	INTEGER NOT NULL,
 	"character_id"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("draft_id" AUTOINCREMENT)
 );
 ''',
 
 '''CREATE TABLE "matches" (
 	"match_id"	INTEGER NOT NULL UNIQUE,
 	"link"	TEXT NOT NULL UNIQUE,
+	"team1_id"	INTEGER NOT NULL,
+	"team2_id"	INTEGER NOT NULL,
 	PRIMARY KEY("match_id" AUTOINCREMENT)
 );
 ''',
 
 '''CREATE TABLE "games" (
-	"id"	INTEGER NOT NULL UNIQUE,
-	"team1_id"	INTEGER NOT NULL,
-	"team2_id"	INTEGER NOT NULL,
+	"game_id"	INTEGER NOT NULL UNIQUE,
+	"match_id"	INTEGER NOT NULL,
 	"result"	INTEGER NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("game_id" AUTOINCREMENT)
 );
 ''',
 
 '''CREATE TABLE "teams" (
-	"id"	INTEGER NOT NULL UNIQUE,
+	"team_id"	INTEGER NOT NULL UNIQUE,
 	"name"	INTEGER NOT NULL UNIQUE,
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("team_id" AUTOINCREMENT)
 );
 '''
-]
+)

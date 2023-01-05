@@ -16,15 +16,8 @@
 from requests import get
 from tools.stringwiz import stringsInside
 from tools.threadbooster import ThreadBooster
+from tools.GameReviewer.types import Match
 
-
-def matchDataMask(link:str) -> dict:
-    return {
-        "link": link,
-        "teams": [],
-        "drafts": [[], []],
-        "wins": []
-    }
 
 
 class Escorenews(ThreadBooster):
@@ -37,7 +30,7 @@ class Escorenews(ThreadBooster):
     @staticmethod
     def getResult(multithreads, matchLinkAddition:str):
         page = get("https://escorenews.com/" + matchLinkAddition).text
-        result = matchDataMask(matchLinkAddition)
+        result = Match.matchDataMask(matchLinkAddition)
 
         # #for test
         # with open("a.txt", "w", encoding="utf-8") as f:
@@ -51,8 +44,8 @@ class Escorenews(ThreadBooster):
 
         #getting scores
         scores = [
-            stringsInside(page, '<span rel="t1" class="team green">', '</span>'),
-            stringsInside(page, '<span rel="t2" class="team red">', '</span>')
+            stringsInside(page, '<span rel="t1" class="team green">', '</span>', lambda x: x.lower()),
+            stringsInside(page, '<span rel="t2" class="team red">', '</span>', lambda x: x.lower())
             ]
         
         # skip if it is empty match
@@ -96,4 +89,26 @@ class Escorenews(ThreadBooster):
                 result["wins"][scoreNumber] = 1 - result["wins"][scoreNumber]
                 result["drafts"][0][scoreNumber], result["drafts"][1][scoreNumber] = result["drafts"][1][scoreNumber], result["drafts"][0][scoreNumber]
 
-        multithreads.addResult(result)
+        multithreads._addResult(result)
+
+
+    @staticmethod
+    def pageExists(pageNumber:int):
+        if get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text.find('<div class="nodata">No matches found</div>') != -1:
+            return False
+        return True
+        
+
+    @staticmethod
+    def getLastPageNumber() -> int:
+        step = 1000
+        result = 0
+        plus = True
+        
+        while step >= 1:
+            result += step if plus else -step
+            if plus != Escorenews.pageExists(result):
+                plus = not plus
+                step /= 10
+                continue
+        return int(result)

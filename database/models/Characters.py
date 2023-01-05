@@ -14,23 +14,40 @@
 
 
 class Characters():
-    def characterExists(self, name:str) -> bool:
-        """Checks for character by name
+    def characterIdExists(self, name:str) -> int:
+        """"Returns character's id (if exists) by name
 
         Args:
-            name (str): character's name
+            name (str): Character's name
 
         Returns:
-            bool: True if exists, False if not
+            int|None: If characterId does not exist returns None
         """
-        self.cur.execute("SELECT id FROM characters WHERE name=? LIMIT 1", (name,))
-        return bool(self.cur.fetchall())
+        self.cur.execute("SELECT character_id FROM characters WHERE name==? LIMIT 1", (name,))
+        result = self.cur.fetchall()
+        return result[0][0] if result else None
+    
+    def characterId(self, name:str) -> int:
+        """Returns characters's id anyways, if it does not exist creates character
+
+        Args:
+            name (str): Character's name
+
+        Returns:
+            int: Character's id
+        """
+        charId = self.characterIdExists(name)
+        return charId if charId else self.characterAdd(name)
     
     
-    def characterAdd(self, name:str) -> None:
+    def characterAdd(self, name:str) -> int:
         """Add character to the database
 
         Args:
-            name (str): character's name
+            name (str): Character's name
+
+        Returns:
+            int: Character's id
         """
-        self.cur.execute("INSERT INTO characters(name) VALUES(?)", (name,))
+        self.cur.execute("INSERT INTO characters(name) VALUES(?) RETURNING character_id", (name,))
+        return self.cur.fetchall()[0][0]

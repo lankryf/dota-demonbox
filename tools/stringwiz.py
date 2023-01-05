@@ -13,4 +13,16 @@
 # limitations under the License.
 
 def stringsInside(text:str, start:str, end:str, funcForInsides=lambda x: x) -> list[str]:
+    """Gets text inside patterns (start, end) without including patterns.
+    Has transformation functioin for each result inside list.
+
+    Args:
+        text (str): Source text
+        start (str): Start text patern 
+        end (str): End text patern
+        funcForInsides (function, optional): Transformation functioin. Defaults to lambdax:x.
+
+    Returns:
+        list[str]: List of results
+    """
     return [funcForInsides(t.split(end, 1)[0]) for t in text.split(start)[1:]]

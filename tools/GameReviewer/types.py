@@ -20,25 +20,54 @@ class Match:
     def __getattr__(self, name):
         return self.__gamedata[name]
     
+    
+    @staticmethod
+    def matchDataMask(link:str) -> dict:
+        return {
+            "link": link,
+            "teams": [],
+            "drafts": [[], []],
+            "wins": []
+        }
+
+    @property
+    def byGames(self):
+        for gameNumber in range(len(self.drafts[0])):
+            yield Game([self.drafts[0][gameNumber], self.drafts[1][gameNumber]], self.wins[gameNumber])
+            
+    
+    
     @property
     def total(self) -> list[int]:
         result = [0, 0]
         for team in self.wins:
             result[team] += 1
         return result
+
+
+
+class Game:
+    def __init__(self, drafts:list[list[str]], result:int):
+        self.__drafts = [Draft(draft) for draft in drafts]
+        self.__result = result
     
-
-
-
-
-# class Draft:
-#     def __init__(self, draftlist:list[str]) -> None:
-#         self.__stringList = draftlist
+    @property
+    def drafts(self):
+        return self.__drafts
     
-#     @property
-#     def stringList(self) -> list[str]:
-#         return self.__stringList
+    @property
+    def result(self):
+        return self.__result
 
-#     @property
-#     def idsList(self) -> list[int]:
-        
+
+
+class Draft:
+    def __init__(self, draftlist:list[str]) -> None:
+        self.__stringList = draftlist
+    
+    @property
+    def stringList(self) -> list[str]:
+        return self.__stringList
+    
+    def idList(self, databar) -> list[int]:
+        return [databar.characterId(name) for name in self.__stringList]

@@ -20,26 +20,28 @@ class ThreadBooster:
         self.__inputs = []
         self.__results = []
         self.__threads = []
-    
-    def addResult(self, data) -> None:
+
+
+    def _addResult(self, data) -> None:
         self.__results.append(data)
+
 
     @property
     def results(self):
         return self.__results
-    
+
+
     def __makeThreads(self, dose:list) -> None:
         self.__threads = [Thread(target=self.__class__.getResult, args=(self, d)) for d in dose]
-    
+
+
     def __getInputsDose(self):
         dose = self.__inputs[:self.__threadsNumber]
         self.__inputs = self.__inputs[self.__threadsNumber:]
         return dose
 
-    def clear(self):
-        self.__results.clear()
 
-    def process(self):
+    def __process(self):
         for thread in self.__threads:
             thread.start()
         for thread in self.__threads:
@@ -47,18 +49,21 @@ class ThreadBooster:
 
 
     def findInput(self, *args):
+        """Executes getInputs function with args, ready to process
+        """
         self.__inputs = self.getInputs(*args)
 
 
     def __iter__(self):
         return self
 
+
     def __next__(self):
         dose = self.__getInputsDose()
         if dose:
-            self.clear()
+            self.__results.clear()
             self.__makeThreads(dose)
-            self.process()
+            self.__process()
             return self.__results
         else:
             raise StopIteration()

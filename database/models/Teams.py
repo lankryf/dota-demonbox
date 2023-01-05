@@ -14,22 +14,41 @@
 
 
 class Teams:
-    def teamExists(self, name:str) -> bool:
-        """Checks for team by name
+    def teamIdExists(self, name:str) -> int|None:
+        """Returns team's id (if exists) by name
 
         Args:
-            name (str): team's name
+            name (str): Team's name
 
         Returns:
-            bool: True if exists, False if not
+            int|None: If teamId does not exist returns None
         """
-        self.cur.execute("SELECT id FROM teams WHERE name=? LIMIT 1", (name,))
-        return bool(self.cur.fetchall())
-    
-    def teamAdd(self, name:str) -> None:
+        self.cur.execute("SELECT team_id FROM teams WHERE name=? LIMIT 1", (name,))
+        result = self.cur.fetchall()
+        return result[0][0] if result else None
+
+
+    def teamId(self, name:str) -> int:
+        """Returns team's id anyways, if it does not exist creates team
+
+        Args:
+            name (str): Team's name
+
+        Returns:
+            int: Team's id
+        """
+        teamId = self.teamIdExists(name)
+        return teamId if teamId else self.teamAdd(name)
+
+
+    def teamAdd(self, name:str) -> int:
         """Add team to the database
 
         Args:
-            name (str): team's name
+            name (str): Team's name
+
+        Returns:
+            int: Team's id
         """
-        self.cur.execute("INSERT INTO teams(name) VALUES(?)", (name,))
+        self.cur.execute("INSERT INTO teams(name) VALUES(?) RETURNING team_id", (name,))
+        return self.cur.fetchall()[0][0]
