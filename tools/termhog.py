@@ -17,6 +17,7 @@ class TermHog:
     def __init__(self, colors:dict[dict[int]]):
         screen = curses.initscr()
         self.rows, self.cols = screen.getmaxyx()
+        self.history = []
         curses.noecho()
         curses.start_color()
         curses.use_default_colors()
@@ -98,14 +99,22 @@ class TermHog:
         while not result:
             ch = win.getch()
             while ch != 10:
-                if ch == 127:
-                    if result:
-                        win.delch(0, len(result)-1)
-                        result = result[:-1]
-                else:
-                    win.addch(ch)
-                    result += chr(ch)
-
+                
+                
+                match ch:
+                    
+                    case 127:
+                        if result:
+                            win.delch(0, len(result)-1)
+                            result = result[:-1]
+                    
+                    
+                    
+                    case _:
+                        win.addch(ch)
+                        result += chr(ch)
+        
+                        
                 ch = win.getch()
 
             if allowEmpty:
