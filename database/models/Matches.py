@@ -47,7 +47,6 @@ class Matches:
             gameId = self.cur.fetchall()[0][0]
             for teamNumber, draft in enumerate(game.drafts):
                 for characterId in draft.idList(self):
-                    print(characterId)
                     self.cur.execute(
                         "INSERT INTO drafts(game_id, team, character_id) VALUES(?,?,?)",
                         (gameId, teamNumber, characterId)

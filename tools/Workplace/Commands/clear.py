@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from tools.Workplace.Workplace import Workplace
+from tools.Workplace.Command import Command
 
-def clear(wp:Workplace, args:list[str]):
+def clear(wp:Workplace, cmd:Command):
     win = wp.hog.wins["main"]
     win.erase()
     win.refresh()
-    

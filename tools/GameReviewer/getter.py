@@ -89,7 +89,7 @@ class Escorenews(ThreadBooster):
                 result["wins"][scoreNumber] = 1 - result["wins"][scoreNumber]
                 result["drafts"][0][scoreNumber], result["drafts"][1][scoreNumber] = result["drafts"][1][scoreNumber], result["drafts"][0][scoreNumber]
 
-        multithreads._addResult(result)
+        multithreads._addResult(Match(result))
 
 
     @staticmethod

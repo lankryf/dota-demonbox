@@ -48,7 +48,7 @@ class ThreadBooster:
             thread.join()
 
 
-    def findInput(self, *args):
+    def loadInput(self, *args):
         """Executes getInputs function with args, ready to process
         """
         self.__inputs = self.getInputs(*args)

@@ -15,10 +15,10 @@
 from tools.Workplace.Workplace import Workplace
 from tools.Workplace.Command import Command
 
-def backup(wp:Workplace, cmd:Command):    
+def tasks(wp:Workplace, cmd:Command):
     if 'c' in cmd.flags:
-        wp.bar.clearWithBackup()
-        wp.hog.ok("Backuped and cleared.")
+        wp.tasks.clear()
+        wp.tasks.save()
+        wp.hog.ok("Cleared!")
     else:
-        wp.bar.backup()
-        wp.hog.ok("Backuped.")
+        wp.hog.info("There is no function here :)")

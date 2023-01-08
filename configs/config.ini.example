@@ -1,2 +1,10 @@
+[database]
+path = database/data.db
+backupsFolder = database/backups
+
+[commands]
+path = tools/Workplace/Commands
+
 [processing]
-threadCount=4
+threadCount=8
+taskFilePath = configs/tasks.json

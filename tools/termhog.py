@@ -48,6 +48,7 @@ class TermHog:
         
     def __winsSetup(self):
         self.wins["main"].scrollok(True)
+        self.wins["main"].nodelay(True)
     
     
     def __printFullColor(self, text:str, color:int) -> None:
@@ -91,6 +92,13 @@ class TermHog:
         self.err(text)
         self.done(text)
         self.fatal(text)
+    
+    
+    def wantToStopProcess(self) -> bool:
+        if self.wins["main"].getch() == 24:
+            return True
+        return False
+    
     
     def input(self, allowEmpty:bool=False):
         win = self.wins["input"]
