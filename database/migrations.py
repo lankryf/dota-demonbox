@@ -26,6 +26,11 @@ migrations = (
 	"team"	INTEGER NOT NULL,
 	"character_id"	INTEGER NOT NULL,
 	PRIMARY KEY("draft_id" AUTOINCREMENT)
+ 
+	CONSTRAINT drafts_cascade
+    	FOREIGN KEY (game_id)
+    	REFERENCES games (game_id)
+    	ON DELETE CASCADE
 );
 ''',
 
@@ -43,6 +48,11 @@ migrations = (
 	"match_id"	INTEGER NOT NULL,
 	"result"	INTEGER NOT NULL,
 	PRIMARY KEY("game_id" AUTOINCREMENT)
+ 
+	CONSTRAINT games_cascade
+    	FOREIGN KEY (match_id)
+    	REFERENCES matches (match_id)
+    	ON DELETE CASCADE
 );
 ''',
 
