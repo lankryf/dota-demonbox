@@ -16,7 +16,7 @@
 from requests import get
 from tools.stringwiz import stringsInside
 from tools.threadbooster import ThreadBooster
-from tools.GameReviewer.types import Match
+from tools.GameReviewer.types import Match, Game, DraftStr
 
 
 
@@ -30,16 +30,6 @@ class Escorenews(ThreadBooster):
     @staticmethod
     def getResult(multithreads, matchLinkAddition:str):
         page = get("https://escorenews.com/" + matchLinkAddition).text
-        result = Match.matchDataMask(matchLinkAddition)
-
-        # #for test
-        # with open("a.txt", "w", encoding="utf-8") as f:
-        #     f.write(page)
-
-        #getting drafts
-        for side in range(2):
-            for game in stringsInside(page, f'<div class="heroes t{side+1}">', '</div>'):
-                result["drafts"][side].append(stringsInside(game, '<picture class="hero tt" title="', '">', lambda x: x.lower()))
 
 
         #getting scores
@@ -47,16 +37,23 @@ class Escorenews(ThreadBooster):
             stringsInside(page, '<span rel="t1" class="team green">', '</span>', lambda x: x.lower()),
             stringsInside(page, '<span rel="t2" class="team red">', '</span>', lambda x: x.lower())
             ]
-        
         # skip if it is empty match
         if not len(scores[0]):
             return
-
-        for score in scores[0]:
-            if score[:3] == "<u>":
-                result["wins"].append(0)
-            else:
-                result["wins"].append(1)
+        
+        
+        #getting drafts and scores
+        games = []
+        sides = [stringsInside(page, f'<div class="heroes t{side}">', '</div>') for side in range(1, 3)]
+        for gameNumber in range(len(sides[0])):
+            games.append(Game(
+                [DraftStr(
+                    stringsInside(side[gameNumber],
+                               '<picture class="hero tt" title="', '">',
+                               lambda x: x.lower())) for side in sides
+                ],
+                0 if scores[0][:3] == "<u>" else 1
+            ))
 
 
         #remove tage from team name
@@ -67,29 +64,29 @@ class Escorenews(ThreadBooster):
 
 
         #getting team names
+        teamsNames = []
         for score in scores:
-            result["teams"].append(removeTag(score[0]))
+            teamsNames.append(removeTag(score[0]))
 
 
         #postprocessing
-        for scoreNumber in range(1, len(scores[0])):
+        for gameNumber in range(1, len(games)):
 
-            #replace incorrect team names
             teams = [None, None]
+            #replace incorrect team names
             for scoresNumber in range(len(scores)):
-                scoreNoTag = removeTag(scores[scoresNumber][scoreNumber])
-                if scoreNoTag in result["teams"]:
+                scoreNoTag = removeTag(scores[scoresNumber][gameNumber])
+                if scoreNoTag in teamsNames:
                     teams[scoresNumber] = scoreNoTag
             if None in teams:
                 noneIndex = teams.index(None)
-                teams[noneIndex] = [name for name in result["teams"] if name != teams[1-noneIndex]][0]
+                teams[noneIndex] = [name for name in teamsNames if name != teams[1-noneIndex]][0]
 
             #reverce sides if it's wanted
-            if teams != result["teams"]:
-                result["wins"][scoreNumber] = 1 - result["wins"][scoreNumber]
-                result["drafts"][0][scoreNumber], result["drafts"][1][scoreNumber] = result["drafts"][1][scoreNumber], result["drafts"][0][scoreNumber]
-
-        multithreads._addResult(Match(result))
+            if teams != teamsNames:
+                games[gameNumber].reverse()
+        
+        multithreads._addResult(Match(games, matchLinkAddition, teamsNames))
 
 
     @staticmethod

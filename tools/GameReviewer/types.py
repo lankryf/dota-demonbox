@@ -13,43 +13,57 @@
 # limitations under the License.
 
 
-class Match:
-    def __init__(self, gamedata:dict) -> None:
-        self.__gamedata = gamedata
 
-    def __getattr__(self, name):
-        return self.__gamedata[name]
+class Draft:
+    @classmethod
+    def empty(cls):
+        return cls([])  
     
-    
-    @staticmethod
-    def matchDataMask(link:str) -> dict:
-        return {
-            "link": link,
-            "teams": [],
-            "drafts": [[], []],
-            "wins": []
-        }
 
-    @property
-    def byGames(self):
-        for gameNumber in range(len(self.drafts[0])):
-            yield Game([self.drafts[0][gameNumber], self.drafts[1][gameNumber]], self.wins[gameNumber])
-            
+
+class DraftStr(Draft):
+    def __init__(self, namesList:list[str]) -> None:
+        self.__draftList = namesList
     
+    def addCharacter(self, characterName:str) -> None:
+        self.__draftList.append(characterName)
     
-    @property
-    def total(self) -> list[int]:
-        result = [0, 0]
-        for team in self.wins:
-            result[team] += 1
-        return result
+    def stringsList(self) -> list[int]:
+        return self.__draftList
+    
+    def idsList(self, databar) -> list[int]:
+        return [databar.characterId(name) for name in self.__draftList]
+
+
+class DraftId(Draft):
+    def __init__(self, idsList:list[int]) -> None:
+        self.__draftList = idsList
+    
+    def addCharacter(self, characterId:int) -> None:
+        self.__draftList.append(characterId)
+    
+    def idsList(self) -> list[int]:
+        return self.__draftList
 
 
 
 class Game:
-    def __init__(self, drafts:list[list[str]], result:int):
-        self.__drafts = [Draft(draft) for draft in drafts]
+    def __init__(self, drafts:list[DraftId|DraftStr], result:int, id:int|None=None):
+        self.__drafts = drafts
         self.__result = result
+        self.__id = id
+    
+    
+    @classmethod
+    def empty(cls, result:int, id:int|None=None, draftClass:type[DraftId]|type[DraftStr]=DraftId):
+        return cls([draftClass.empty() for _ in range(2)], result, id)
+    
+    def setDraft(self, team:int, draft:Draft) -> None:
+        self.__drafts[team] = draft
+    
+    def reverse(self) -> None:
+        self.__drafts.reverse()
+        self.__result = 1 - self.result
     
     @property
     def drafts(self):
@@ -58,16 +72,44 @@ class Game:
     @property
     def result(self):
         return self.__result
-
-
-
-class Draft:
-    def __init__(self, draftlist:list[str]) -> None:
-        self.__stringList = draftlist
     
     @property
-    def stringList(self) -> list[str]:
-        return self.__stringList
+    def id(self) -> int|None:
+        return self.__id
+
     
-    def idList(self, databar) -> list[int]:
-        return [databar.characterId(name) for name in self.__stringList]
+class Match:
+    def __init__(self, games:list[Game], link:str, teams:list[str], id:int|None=None) -> None:
+        self.__games = games
+        self.__link = link
+        self.__teams = teams
+        self.__id = id
+    
+    def __getitem__(self, index) -> Game:
+        return self.__games[index]
+    
+    @classmethod
+    def empty(cls, link:str, team1, team2, id:int|None=None):
+        return cls([], link, [team1, team2], id)
+    
+    def addGame(self, game:Game) -> None:
+        self.__games.append(game)
+    
+    @property
+    def link(self) -> str:
+        return self.__link
+    
+    @property
+    def teams(self) -> str:
+        return self.__teams
+    
+    @property
+    def id(self) -> int|None:
+        return self.__id
+    
+    @property
+    def total(self) -> list[int]:
+        result = [0, 0]
+        for game in self.__games:
+            result[game.result] += 1
+        return result

@@ -36,12 +36,12 @@ class TermHog:
         self.wins = {
             "main": curses.newwin(self.rows-4, self.cols//2-1, 1, 1),
             "input": curses.newwin(1, self.cols-2, self.rows-2, 1),
-            "process": curses.newwin(self.rows//2-1, self.cols//2-2, 1, self.cols//2+1),
-            "gen": curses.newwin(self.rows//2-2, self.cols//2-2, self.rows//2, self.cols//2+1)
+            "process": curses.newwin(3, self.cols//2-2, 1, self.cols//2+1),
+            "gen": curses.newwin(self.rows-7, self.cols//2-2, 4, self.cols//2+1)
         }
         self.wins["main"].scrollok(True)
         for win in self.wins:
-            self.wins[win].border()
+            # self.wins[win].border()
             self.wins[win].refresh()
         self.__winsSetup()
         
@@ -98,8 +98,12 @@ class TermHog:
         if self.wins["main"].getch() == 24:
             return True
         return False
-    
-    
+
+
+    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS"):
+        return Progressbar(self.wins["process"], iterable, iterLen, processName)
+
+
     def input(self, allowEmpty:bool=False):
         win = self.wins["input"]
         result = ""
@@ -130,3 +134,52 @@ class TermHog:
 
         win.erase()
         return result
+
+
+
+class Progressbar:
+        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str):
+            self.__win = win
+            self.__width  = win.getmaxyx()[1]-2
+            self.__name = processName
+            self.__iterLen = iterLen
+            self.__iterable = iterable
+            self.__barNow = 0
+            self.__oneStep = iterLen / self.__width
+            
+            
+            self.__draw()
+            
+        
+        def __draw(self):
+            self.__win.erase()
+            self.__win.border()
+            self.__win.addstr(0, 1, self.__name)
+            self.__win.addstr(2, 1, f"{' ' * len(str(self.__iterLen))}/{self.__iterLen}")
+            self.__drawBar(".")
+
+        def __drawBar(self, symb:str):
+            self.__win.addstr(1, 0, f"[{symb*self.__width}]")
+            self.__win.refresh()
+        
+        def __moveBar(self):
+            self.__barNow += 1
+            self.__win.addch(1, self.__barNow, ord('#'), curses.color_pair(2))
+
+        def __done(self):
+            self.__win.addstr(2, self.__width-3, "DONE", curses.color_pair(4))
+            self.__win.refresh()
+
+        def __makeStep(self, n:int):
+            if n // self.__oneStep > self.__barNow:
+                self.__moveBar()
+            self.__win.addstr(2, 1, str(n))
+            self.__win.refresh()
+        
+        def __iter__(self):
+            for n, i in enumerate(self.__iterable, 1):
+                yield n, i
+                self.__makeStep(n)
+            
+            self.__done()
+            

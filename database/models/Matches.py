@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.GameReviewer.types import Match
+from tools.GameReviewer.types import Match, Game, Draft
 
 class Matches:
     """Matches include games, drafts
@@ -29,6 +29,42 @@ class Matches:
         self.cur.execute("SELECT match_id FROM matches WHERE name=? LIMIT 1", (name,))
         return bool(self.cur.fetchall())
     
+    
+    def matchIterate(self):
+        self.cur.execute('''
+            SELECT matches.link, matches.team1_id,
+                matches.team2_id, matches.match_id,
+                games.result, games.game_id,
+                drafts.team, drafts.character_id
+            
+            FROM matches, games, drafts 
+            
+            ON drafts.game_id = games.game_id
+                AND games.match_id = matches.match_id''')
+
+        # first
+        first = next(self.cur)
+        match = Match.empty(*first[:4])
+        game = Game.empty(*first[4:6])
+        game.drafts[first[6]].addCharacter(first[7])
+        
+        # other
+        for row in self.cur:
+            if row[5] != game.id:
+                match.addGame(game)
+                game = Game.empty(*row[4:6])
+            
+            game.drafts[row[6]].addCharacter(row[7])
+            
+            if row[3] != match.id:
+                yield match
+                match = Match.empty(*row[:4])
+        
+        match.addGame(game)
+        yield match
+
+
+
     def matchAdd(self, match:Match):
         
         #insert match and teams
@@ -39,14 +75,14 @@ class Matches:
         matchId = self.cur.fetchall()[0][0]
         
         #inert games and drafts
-        for game in match.byGames:
+        for game in match:
             self.cur.execute(
                 "INSERT INTO games(match_id, result) VALUES(?,?) RETURNING game_id",
                 (matchId, game.result)
             )
             gameId = self.cur.fetchall()[0][0]
             for teamNumber, draft in enumerate(game.drafts):
-                for characterId in draft.idList(self):
+                for characterId in draft.idsList(self):
                     self.cur.execute(
                         "INSERT INTO drafts(game_id, team, character_id) VALUES(?,?,?)",
                         (gameId, teamNumber, characterId)
