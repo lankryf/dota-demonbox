@@ -64,6 +64,10 @@ class Matches:
         yield match
 
 
+    def matchCount(self):
+        self.cur.execute("SELECT COUNT(*) FROM matches")
+        return self.cur.fetchall()[0][0]
+
 
     def matchAdd(self, match:Match):
         

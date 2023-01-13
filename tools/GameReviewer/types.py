@@ -17,33 +17,36 @@
 class Draft:
     @classmethod
     def empty(cls):
-        return cls([])  
+        return cls([])
+    
+    def __len__(self):
+        return len(self._draftList)
     
 
 
 class DraftStr(Draft):
     def __init__(self, namesList:list[str]) -> None:
-        self.__draftList = namesList
+        self._draftList = namesList
     
     def addCharacter(self, characterName:str) -> None:
-        self.__draftList.append(characterName)
+        self._draftList.append(characterName)
     
     def stringsList(self) -> list[int]:
-        return self.__draftList
+        return self._draftList
     
     def idsList(self, databar) -> list[int]:
-        return [databar.characterId(name) for name in self.__draftList]
+        return [databar.characterId(name) for name in self._draftList]
 
 
 class DraftId(Draft):
     def __init__(self, idsList:list[int]) -> None:
-        self.__draftList = idsList
+        self._draftList = idsList
     
     def addCharacter(self, characterId:int) -> None:
-        self.__draftList.append(characterId)
+        self._draftList.append(characterId)
     
     def idsList(self) -> list[int]:
-        return self.__draftList
+        return self._draftList
 
 
 
@@ -87,6 +90,9 @@ class Match:
     
     def __getitem__(self, index) -> Game:
         return self.__games[index]
+    
+    def __len__(self):
+        return len(self.__games)
     
     @classmethod
     def empty(cls, link:str, team1, team2, id:int|None=None):

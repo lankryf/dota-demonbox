@@ -37,7 +37,7 @@ class TermHog:
             "main": curses.newwin(self.rows-4, self.cols//2-1, 1, 1),
             "input": curses.newwin(1, self.cols-2, self.rows-2, 1),
             "process": curses.newwin(3, self.cols//2-2, 1, self.cols//2+1),
-            "gen": curses.newwin(self.rows-7, self.cols//2-2, 4, self.cols//2+1)
+            "gen": curses.newwin(self.rows-8, self.cols//2-2, 5, self.cols//2+1)
         }
         self.wins["main"].scrollok(True)
         for win in self.wins:
@@ -83,6 +83,16 @@ class TermHog:
 
     def warn(self, text:str) -> None:
         self.__printFullColor(" " + text, 8)
+    
+    def space(self, spaces:int=1):
+        win = self.wins["main"]
+        win.scroll(spaces)
+        win.refresh()
+        
+    def clear(self):
+        win = self.wins["main"]
+        win.erase()
+        win.refresh()
     
     def exampleTest(self) -> None:
         text = "This is an example text."
@@ -144,7 +154,7 @@ class Progressbar:
             self.__name = processName
             self.__iterLen = iterLen
             self.__iterable = iterable
-            self.__barNow = 0
+            self.__barNow = 1
             self.__oneStep = iterLen / self.__width
             
             
@@ -155,24 +165,25 @@ class Progressbar:
             self.__win.erase()
             self.__win.border()
             self.__win.addstr(0, 1, self.__name)
-            self.__win.addstr(2, 1, f"{' ' * len(str(self.__iterLen))}/{self.__iterLen}")
-            self.__drawBar(".")
+            self.__win.addstr(2, 1, f"0{' ' * (len(str(self.__iterLen))-1)}/{self.__iterLen}")
+            self.__drawBar(".", 2)
 
-        def __drawBar(self, symb:str):
-            self.__win.addstr(1, 0, f"[{symb*self.__width}]")
+        def __drawBar(self, symb:str, colorPair:int):
+            self.__win.addstr(1, 0, f"[{symb*self.__width}]", curses.color_pair(colorPair))
             self.__win.refresh()
         
-        def __moveBar(self):
-            self.__barNow += 1
-            self.__win.addch(1, self.__barNow, ord('#'), curses.color_pair(2))
+        def __moveBar(self, newBarPosition:int):
+            self.__win.addstr(1, self.__barNow, "#"*(newBarPosition - self.__barNow), curses.color_pair(2))
+            self.__barNow = newBarPosition
 
         def __done(self):
             self.__win.addstr(2, self.__width-3, "DONE", curses.color_pair(4))
-            self.__win.refresh()
+            self.__drawBar("#", 2)
 
         def __makeStep(self, n:int):
-            if n // self.__oneStep > self.__barNow:
-                self.__moveBar()
+            newBarPosition = int(n // self.__oneStep)
+            if newBarPosition > self.__barNow:
+                self.__moveBar(newBarPosition)
             self.__win.addstr(2, 1, str(n))
             self.__win.refresh()
         
