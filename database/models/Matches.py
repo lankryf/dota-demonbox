@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.GameReviewer.types import Match, Game, Draft
+from tools.Matches.types import Match, Game
 
 class Matches:
     """Matches include games, drafts

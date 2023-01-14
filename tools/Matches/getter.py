@@ -16,7 +16,7 @@
 from requests import get
 from tools.stringwiz import stringsInside
 from tools.threadbooster import ThreadBooster
-from tools.GameReviewer.types import Match, Game, DraftStr
+from tools.Matches.types import Match, Game, DraftStr
 
 
 

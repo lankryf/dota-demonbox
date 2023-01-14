@@ -15,7 +15,7 @@
 from tools.Workplace.Workplace import Workplace
 from tools.Workplace.Command import Command
 
-from tools.GameReviewer.getter import Escorenews
+from tools.Matches.getter import Escorenews
 
 def refresh(wp:Workplace, cmd:Command):
     wp.hog.info("Starting refreshing.")
