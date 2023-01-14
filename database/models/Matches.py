@@ -71,6 +71,10 @@ class Matches:
         self.cur.execute("SELECT COUNT(*) FROM matches")
         return self.cur.fetchall()[0][0]
     
+    
+    def matchDelete(self, matchId:int) -> None:
+        self.cur.execute("DELETE FROM matches WHERE match_id = ?", (matchId,))
+
 
     def matchAdd(self, match:Match):
         

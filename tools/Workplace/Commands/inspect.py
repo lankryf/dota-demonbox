@@ -17,27 +17,39 @@ from tools.Workplace.Command import Command
 
 def inspect(wp:Workplace, cmd:Command):
     wp.hog.info("Starting inspection.")
-    errors = 0
+    errors = []
     matchCount = wp.bar.matchCount()
     
     for _, match in wp.hog.progressbar(wp.bar.matchIterate(), matchCount, "INSPECTION"):
         if len(match) == 0:
             wp.hog.err(f"Empty match {match.id}")
-            errors +=1
+            errors.append(match.id)
             continue
         
         for game in match:
             if len(game.drafts) != 2:
                 wp.hog.err(f"Game {game.id} has {len(game.drafts)} drafts (must be 2)")
-                errors +=1
+                errors.append(match.id)
                 continue
             
             for n, draft in enumerate(game.drafts):
                 if len(draft) != 5:
                     wp.hog.err(f"Draft {n} from game {game.id} has {len(game.drafts)} characters (must be 5)")
-                    errors +=1
+                    errors.append(match.id)
                     continue
 
-    wp.hog.info(f"{matchCount - errors}/{matchCount} matches is ok.")
-    wp.hog.info(f"We have {errors} errors.")
+    wp.hog.info(f"{matchCount - len(errors)}/{matchCount} matches is ok.")
+    wp.hog.info(f"We have {len(errors)} errors.")
+    
+    if 'b' in cmd.flags:
+        wp.bar.backup()
+        wp.hog.ok("Backuped.")
+    
+    if 'f' in cmd.flags:
+        wp.hog.info("Fixing.")
+        errors = set(errors)
+        for matchId in errors:
+            wp.bar.matchDelete(matchId)
+            wp.hog.ok(f"Match {matchId} has been deleted.")
+        wp.bar.commit()
     wp.hog.done("Inspection has been done.")
