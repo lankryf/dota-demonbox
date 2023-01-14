@@ -17,17 +17,20 @@ from tools.GameReviewer.types import Match, Game, Draft
 class Matches:
     """Matches include games, drafts
     """
-    def matchExists(self, name) -> bool:
-        """Checks for match by name
+
+
+    def matchIdExists(self, link:str) -> int|None:
+        """Returns match's id (if exists) by link
 
         Args:
-            name (str): matchs's name
+            link (str): Match's link
 
         Returns:
-            bool: True if exists, False if not
+            int|None: If matchId does not exist returns None
         """
-        self.cur.execute("SELECT match_id FROM matches WHERE name=? LIMIT 1", (name,))
-        return bool(self.cur.fetchall())
+        self.cur.execute("SELECT match_id FROM matches WHERE link=? LIMIT 1", (link,))
+        result = self.cur.fetchall()
+        return result[0][0] if result else None
     
     
     def matchIterate(self):
@@ -67,7 +70,7 @@ class Matches:
     def matchCount(self):
         self.cur.execute("SELECT COUNT(*) FROM matches")
         return self.cur.fetchall()[0][0]
-
+    
 
     def matchAdd(self, match:Match):
         

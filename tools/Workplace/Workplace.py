@@ -89,5 +89,7 @@ class Workplace:
             if cmd.name not in self.commands:
                 self.hog.err(f'Command "{cmd.name}" is not found :(')
                 continue
+            
+            self.hog.space()
             self.commands[cmd.name](self, cmd)
         self.__ending()

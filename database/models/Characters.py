@@ -14,7 +14,7 @@
 
 
 class Characters():
-    def characterIdExists(self, name:str) -> int:
+    def characterIdExists(self, name:str) -> int|None:
         """"Returns character's id (if exists) by name
 
         Args:

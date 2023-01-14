@@ -53,6 +53,11 @@ class ThreadBooster:
         """
         self.__inputs = self.getInputs(*args)
 
+    def flow(self):
+        for result in self:
+            for object in result:
+                yield object
+
 
     def __iter__(self):
         return self

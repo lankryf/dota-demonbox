@@ -177,6 +177,7 @@ class Progressbar:
             self.__barNow = newBarPosition
 
         def __done(self):
+            self.__win.addstr(2, 1, str(self.__iterLen))
             self.__win.addstr(2, self.__width-3, "DONE", curses.color_pair(4))
             self.__drawBar("#", 2)
 
