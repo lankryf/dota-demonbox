@@ -35,7 +35,7 @@ class DraftStr(Draft):
         return self._draftList
     
     def idsList(self, databar) -> list[int]:
-        return [databar.characterId(name) for name in self._draftList]
+        return [databar.characterIdAnyways(name) for name in self._draftList]
 
 
 class DraftId(Draft):

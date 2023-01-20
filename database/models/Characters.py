@@ -14,7 +14,7 @@
 
 
 class Characters():
-    def characterIdExists(self, name:str) -> int|None:
+    def characterIdByName(self, name:str) -> int|None:
         """"Returns character's id (if exists) by name
 
         Args:
@@ -23,11 +23,11 @@ class Characters():
         Returns:
             int|None: If characterId does not exist returns None
         """
-        self.cur.execute("SELECT character_id FROM characters WHERE name==? LIMIT 1", (name,))
+        self.cur.execute("SELECT character_id FROM characters_names WHERE name==? LIMIT 1", (name,))
         result = self.cur.fetchall()
         return result[0][0] if result else None
     
-    def characterId(self, name:str) -> int:
+    def characterIdAnyways(self, name:str) -> int:
         """Returns characters's id anyways, if it does not exist creates character
 
         Args:
@@ -36,18 +36,46 @@ class Characters():
         Returns:
             int: Character's id
         """
-        charId = self.characterIdExists(name)
-        return charId if charId else self.characterAdd(name)
+        charId = self.characterIdByName(name)
+        if charId:
+            return charId
+        
+        charId = self.characterAdd()
+        self.characterAddName(charId, name)
+        return charId
     
     
-    def characterAdd(self, name:str) -> int:
-        """Add character to the database
+    def characterAdd(self, tinyName:str=None, color:int=None) -> int:
+        """Adds character to the database
 
         Args:
-            name (str): Character's name
+            tinyName (str, optional): Name's tiny form, will be used for search. Defaults to None.
+            color (int, optional): Color of the character's name. Defaults to None.
 
         Returns:
             int: Character's id
         """
-        self.cur.execute("INSERT INTO characters(name) VALUES(?) RETURNING character_id", (name,))
+        self.cur.execute("INSERT INTO characters(tiny_name, color) VALUES(?,?) RETURNING character_id", (tinyName, color))
         return self.cur.fetchall()[0][0]
+
+
+    def characterAddName(self, characterId:int, name:str) -> None:
+        """Adds character's name to the database
+
+        Args:
+            characterId (int): Character's id
+            name (str): Name that should be added
+        """
+        self.cur.execute("INSERT INTO characters_names(character_id, name) VALUES(?,?)", (characterId, name))
+
+
+    def characterFusionAndDelete(self, oldCharId:int, newCharId:int) -> None:
+        """Deletes character from database and gives it's names to another
+
+        Args:
+            oldCharId (int): Id of character that should be deleted
+            newCharId (int): Id of character that will take names
+        """
+        for table in ('characters_names', 'drafts'):
+            self.cur.execute(f"UPDATE {table} SET character_id = ? WHERE character_id == ?", (newCharId, oldCharId))
+        self.cur.execute("DELETE FROM characters WHERE character_id = ?", (oldCharId,))

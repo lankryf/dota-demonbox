@@ -13,53 +13,60 @@
 # limitations under the License.
 
 migrations = (
-'''CREATE TABLE "characters" (
-	"character_id"	INTEGER NOT NULL UNIQUE,
-	"name"	TEXT NOT NULL UNIQUE,
+'''CREATE TABLE IF NOT EXISTS "characters" (
+	"character_id"	INTEGER NOT NULL,
+	"tiny_name"		TEXT DEFAULT NULL,
+	"color"			INT DEFAULT NULL,
 	PRIMARY KEY("character_id" AUTOINCREMENT)
 );
 ''',
 
-'''CREATE TABLE "drafts" (
-	"draft_id"	INTEGER NOT NULL UNIQUE,
-	"game_id"	INTEGER NOT NULL,
-	"team"	INTEGER NOT NULL,
-	"character_id"	INTEGER NOT NULL,
-	PRIMARY KEY("draft_id" AUTOINCREMENT)
- 
-	CONSTRAINT drafts_cascade
-    	FOREIGN KEY (game_id)
-    	REFERENCES games (game_id)
-    	ON DELETE CASCADE
+'''CREATE TABLE IF NOT EXISTS "characters_names" (
+    "character_name_id"	INTEGER NOT NULL,
+	"character_id"	REFERENCES characters (character_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	"name"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("character_name_id" AUTOINCREMENT)
 );
 ''',
 
-'''CREATE TABLE "matches" (
+'''CREATE TABLE IF NOT EXISTS "drafts" (
+	"draft_id"	INTEGER NOT NULL UNIQUE,
+	"game_id"	REFERENCES games (game_id) ON DELETE CASCADE,
+	"team"	INTEGER NOT NULL,
+	"character_id"	REFERENCES characters (character_id) ON UPDATE CASCADE,
+	PRIMARY KEY("draft_id" AUTOINCREMENT) 
+);
+''',
+
+'''CREATE TABLE IF NOT EXISTS "matches" (
 	"match_id"	INTEGER NOT NULL UNIQUE,
 	"link"	TEXT NOT NULL UNIQUE,
-	"team1_id"	INTEGER NOT NULL,
-	"team2_id"	INTEGER NOT NULL,
+	"team1_id"	REFERENCES teams (team_id) ON UPDATE CASCADE,
+	"team2_id"	REFERENCES teams (team_id) ON UPDATE CASCADE,
 	PRIMARY KEY("match_id" AUTOINCREMENT)
 );
 ''',
 
-'''CREATE TABLE "games" (
+'''CREATE TABLE IF NOT EXISTS "games" (
 	"game_id"	INTEGER NOT NULL UNIQUE,
-	"match_id"	INTEGER NOT NULL,
+	"match_id"	REFERENCES matches (match_id) ON DELETE CASCADE,
 	"result"	INTEGER NOT NULL,
 	PRIMARY KEY("game_id" AUTOINCREMENT)
- 
-	CONSTRAINT games_cascade
-    	FOREIGN KEY (match_id)
-    	REFERENCES matches (match_id)
-    	ON DELETE CASCADE
 );
 ''',
 
-'''CREATE TABLE "teams" (
-	"team_id"	INTEGER NOT NULL UNIQUE,
-	"name"	INTEGER NOT NULL UNIQUE,
+'''CREATE TABLE IF NOT EXISTS "teams" (
+	"team_id"	INTEGER NOT NULL,
+	"tiny_name"	INTEGER DEFAULT NULL,
 	PRIMARY KEY("team_id" AUTOINCREMENT)
+);
+''',
+
+'''CREATE TABLE IF NOT EXISTS "teams_names" (
+	"team_name_id"	INTEGER NOT NULL,
+	"team_id"	REFERENCES teams (team_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	"name"	INTEGER NOT NULL UNIQUE,
+	PRIMARY KEY("team_name_id" AUTOINCREMENT)
 );
 '''
 )

@@ -81,7 +81,7 @@ class Matches:
         #insert match and teams
         self.cur.execute(
             "INSERT INTO matches(link, team1_id, team2_id) VALUES(?,?,?) RETURNING match_id",
-            (match.link, *[self.teamId(name) for name in match.teams])
+            (match.link, *[self.teamIdAnyways(name) for name in match.teams])
         )
         matchId = self.cur.fetchall()[0][0]
         

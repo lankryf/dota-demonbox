@@ -20,7 +20,11 @@ def source(wp:Workplace, cmd:Command):
     wp.hog.info("Starting sourcing.")
     wp.bar.clearWithBackup()
     wp.hog.ok("Backuped and cleared.")
-    tables = ["matches", "games", "drafts", "characters", "teams"]
+    
+    tables = ["teams", "teams_names",
+              "characters","characters_names",
+              "matches", "games", "drafts"]
+    
     wp.hog.info(f"Opening {cmd.args[0]} database.")
     with connect(cmd.args[0]) as donor:
         donorcur = donor.cursor()

@@ -54,6 +54,11 @@ class ThreadBooster:
         self.__inputs = self.getInputs(*args)
 
     def flow(self):
+        """Generator of result's objects.
+
+        Yields:
+            Object (any): object from result's insides
+        """
         for result in self:
             for object in result:
                 yield object
