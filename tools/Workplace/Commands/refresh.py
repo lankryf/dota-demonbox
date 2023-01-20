@@ -31,7 +31,7 @@ def refresh(wp:Workplace, cmd:Command):
         pageNow +=1
         getter.loadInput(pageNow)
         for match in getter.flow():
-            if wp.bar.matchIdExists(match.link):
+            if wp.bar.matchIdByLink(match.link):
                 work = False
                 wp.hog.info(f"Match link {match.link} already in database. Upload has been stoped.")
                 break

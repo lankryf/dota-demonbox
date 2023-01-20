@@ -69,6 +69,8 @@ class Databar(Characters, Teams, Matches):
             self.__cur.execute(migration)
     
     def commit(self):
+        """Makes commit to database
+        """
         self.__conn.commit()
     
     def close(self):

@@ -85,16 +85,25 @@ class TermHog:
         self.__printFullColor(" " + text, 8)
     
     def space(self, spaces:int=1):
+        """Makes indent with empty lines
+
+        Args:
+            spaces (int, optional): Number of empty lines. Defaults to 1.
+        """
         win = self.wins["main"]
         win.scroll(spaces)
         win.refresh()
         
     def clear(self):
+        """Clears main window
+        """
         win = self.wins["main"]
         win.erase()
         win.refresh()
     
     def exampleTest(self) -> None:
+        """Prints all message types
+        """
         text = "This is an example text."
         self.info(text)
         self.warn(text)
@@ -105,6 +114,11 @@ class TermHog:
     
     
     def wantToStopProcess(self) -> bool:
+        """Says if user wants to stop process
+
+        Returns:
+            bool: True if user wants to stop process, else False
+        """
         if self.wins["main"].getch() == 24:
             return True
         return False
@@ -114,7 +128,15 @@ class TermHog:
         return Progressbar(self.wins["process"], iterable, iterLen, processName, start)
 
 
-    def input(self, allowEmpty:bool=False):
+    def input(self, allowEmpty:bool=False) -> str:
+        """Takes string data from user
+
+        Args:
+            allowEmpty (bool, optional): True if result can be empty. Defaults to False.
+
+        Returns:
+            str: string from user
+        """
         win = self.wins["input"]
         result = ""
         
@@ -200,6 +222,12 @@ class Progressbar:
             self.__done()
         
         def withEnumerate(self):
+            """_summary_
+
+            Yields:
+                int: Enumerating from 1
+                any: Current object
+            """
             for n, i in enumerate(self.__iterable, self.__start):
                 yield n, i
                 self.__makeStep(n)

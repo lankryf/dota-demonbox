@@ -31,16 +31,31 @@ class Tasks:
         return self.__tasksData[name]
 
     def hasCurrentTask(self) -> bool:
+        """Does tasks have current task
+
+        Returns:
+            bool: True if has, False if don't
+        """
         return bool(self.currentTask)
 
     def clear(self) -> None:
+        """Clears tasks
+        """
         self.__tasksData = {
             "currentTask": []
         }
     
     def setCurrentTask(self, taskName:str, *args) -> None:
+        """Set current task with arguments
+
+        Args:
+            taskName (str): Task's name
+            *args (any): arguments that should be given to current task
+        """
         self.__tasksData["currentTask"] = [taskName, args]
 
     def save(self) -> None:
+        """Saves changes to file
+        """
         with open(self.__path, "w") as f:
             dump(self.__tasksData, f, indent=4)

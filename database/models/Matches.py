@@ -19,7 +19,7 @@ class Matches:
     """
 
 
-    def matchIdExists(self, link:str) -> int|None:
+    def matchIdByLink(self, link:str) -> int|None:
         """Returns match's id (if exists) by link
 
         Args:
@@ -34,6 +34,11 @@ class Matches:
     
     
     def matchIterate(self):
+        """Yields matches from database
+
+        Yields:
+            Match: Wow, it's a match
+        """
         self.cur.execute('''
             SELECT matches.link, matches.team1_id,
                 matches.team2_id, matches.match_id,
@@ -67,17 +72,31 @@ class Matches:
         yield match
 
 
-    def matchCount(self):
+    def matchCount(self) -> int:
+        """Count of matches
+
+        Returns:
+            int: Count of matches
+        """
         self.cur.execute("SELECT COUNT(*) FROM matches")
         return self.cur.fetchall()[0][0]
     
     
     def matchDelete(self, matchId:int) -> None:
+        """Deletes match from database
+
+        Args:
+            matchId (int): Match's id
+        """
         self.cur.execute("DELETE FROM matches WHERE match_id = ?", (matchId,))
 
 
     def matchAdd(self, match:Match):
-        
+        """Adds match to database
+
+        Args:
+            match (Match): Match that should be added
+        """
         #insert match and teams
         self.cur.execute(
             "INSERT INTO matches(link, team1_id, team2_id) VALUES(?,?,?) RETURNING match_id",
