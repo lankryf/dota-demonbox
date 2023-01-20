@@ -110,8 +110,8 @@ class TermHog:
         return False
 
 
-    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS"):
-        return Progressbar(self.wins["process"], iterable, iterLen, processName)
+    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS", start:int=None):
+        return Progressbar(self.wins["process"], iterable, iterLen, processName, start)
 
 
     def input(self, allowEmpty:bool=False):
@@ -148,7 +148,7 @@ class TermHog:
 
 
 class Progressbar:
-        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str):
+        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str, start:int=None):
             self.__win = win
             self.__width  = win.getmaxyx()[1]-2
             self.__name = processName
@@ -157,8 +157,12 @@ class Progressbar:
             self.__barNow = 1
             self.__oneStep = iterLen / self.__width
             
-            
             self.__draw()
+            
+            self.__start = 1
+            if start is not None:
+                self.__start += start
+                self.__makeStep(start)
             
         
         def __draw(self):
@@ -189,9 +193,15 @@ class Progressbar:
             self.__win.refresh()
         
         def __iter__(self):
-            for n, i in enumerate(self.__iterable, 1):
+            for n, i in enumerate(self.__iterable, self.__start):
+                yield i
+                self.__makeStep(n)
+            
+            self.__done()
+        
+        def withEnumerate(self):
+            for n, i in enumerate(self.__iterable, self.__start):
                 yield n, i
                 self.__makeStep(n)
             
             self.__done()
-            

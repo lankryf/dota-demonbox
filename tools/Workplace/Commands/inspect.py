@@ -20,7 +20,7 @@ def inspect(wp:Workplace, cmd:Command):
     errors = []
     matchCount = wp.bar.matchCount()
     
-    for _, match in wp.hog.progressbar(wp.bar.matchIterate(), matchCount, "INSPECTION"):
+    for match in wp.hog.progressbar(wp.bar.matchIterate(), matchCount, "INSPECTION"):
         if len(match) == 0:
             wp.hog.err(f"Empty match {match.id}")
             errors.append(match.id)

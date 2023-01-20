@@ -34,7 +34,7 @@ def greatload(wp:Workplace, cmd:Command):
 
     wp.hog.info(f"We will start from {starting}")
 
-    for pageNumber in range(starting, 0, -1):
+    for pageNumber in wp.hog.progressbar(range(starting, 0, -1), lastPage, "GREATLOAD", lastPage - starting):
         
         if wp.hog.wantToStopProcess():
             break
@@ -50,8 +50,14 @@ def greatload(wp:Workplace, cmd:Command):
                 wp.hog.ok(message)
             else:
                 wp.hog.err(message)
-    
-    wp.tasks.setCurrentTask(cmd.name, lastPage - pageNumber)
+
+
+    if pageNumber > 1:
+        wp.tasks.setCurrentTask(cmd.name, lastPage - pageNumber)
+    else:
+        wp.tasks.clear()
     wp.tasks.save()
     wp.hog.ok("Task has been saved!")
+    
+    
     wp.hog.done("Refreshed!")
