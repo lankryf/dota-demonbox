@@ -32,7 +32,7 @@ class Databar(Characters, Teams, Matches):
     
     
     def __initConnectionAndCursor(self):
-        self.__conn = sqlite3.connect(self.__path, )
+        self.__conn = sqlite3.connect(self.__path)
         self.__cur = self.__conn.cursor()
         self.__cur.execute("PRAGMA foreign_keys = ON")
     

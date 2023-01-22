@@ -14,7 +14,7 @@
 import curses
 
 class TermHog:
-    def __init__(self, termhogConfig:dict):
+    def __init__(self, termhogConfig:dict) -> None:
         screen = curses.initscr()
         self.rows, self.cols = screen.getmaxyx()
         self.history = []
@@ -26,7 +26,7 @@ class TermHog:
         self.__initWins()
     
     
-    def __initColors(self, colors:dict[dict]):
+    def __initColors(self, colors:dict[dict]) -> None:
         for name in colors:
             curses.init_pair(colors[name]["id"],
                              colors[name]["fg"],
