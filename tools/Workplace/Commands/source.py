@@ -29,7 +29,7 @@ def source(wp:Workplace, cmd:Command):
     with connect(cmd.args[0]) as donor:
         donorcur = donor.cursor()
         
-        for table in tables:
+        for table in wp.hog.progressbar(tables, len(tables), "SOURCING"):
             donorcur.execute(f"SELECT * from {table}")
             for donorrow in donorcur:
                 wp.bar.cur.execute(
@@ -38,3 +38,4 @@ def source(wp:Workplace, cmd:Command):
             wp.hog.ok(f"Table {table} has been copied.")
     wp.bar.commit()
     wp.hog.done("Sourcing has been done.")
+    wp.hog.progressEnding()

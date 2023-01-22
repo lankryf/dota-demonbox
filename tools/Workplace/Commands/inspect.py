@@ -52,4 +52,6 @@ def inspect(wp:Workplace, cmd:Command):
             wp.bar.matchDelete(matchId)
             wp.hog.ok(f"Match {matchId} has been deleted.")
         wp.bar.commit()
+        wp.hog.ok("Commited.")
     wp.hog.done("Inspection has been done.")
+    wp.hog.progressEnding()

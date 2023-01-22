@@ -40,16 +40,22 @@ class Workplace:
     def __setup(self):
         # init termhog
         with open(self.__configsPath + "/termhog.json", "r") as f:
-            self.hog = TermHog(jsonLoad(f)["colors"])
+            self.hog = TermHog(jsonLoad(f))
         self.hog.ok("TermHog has been loaded.")
         
+        self.hog.displayLogo()
+        
         # load config
+        configiniPath = self.__configsPath + "/config.ini"
+        if not ospath.exists(configiniPath):
+            self.hog.fatal(f"Config file {configiniPath} is not exsist.\nPlease, create it using config.ini.example.")
+            self.hog.pressEnterTo("exit")
+            raise(FileNotFoundError(configiniPath))
+            
+        
         self.__config = ConfigParser()
-        try:
-            self.__config.read(self.__configsPath + "/config.ini")
-        #TODO log error
-        except: pass #Exception as e:
-        else: self.hog.ok("Config has been read.")
+        self.__config.read(configiniPath)
+        self.hog.ok("Config has been read.")
 
         # load database
         self.bar = Databar(self.__config["database"]["path"], self.__config["database"]["backupsFolder"])

@@ -14,14 +14,15 @@
 import curses
 
 class TermHog:
-    def __init__(self, colors:dict[dict[int]]):
+    def __init__(self, termhogConfig:dict):
         screen = curses.initscr()
         self.rows, self.cols = screen.getmaxyx()
         self.history = []
         curses.noecho()
         curses.start_color()
         curses.use_default_colors()
-        self.__initColors(colors)
+        self.__logo = termhogConfig["logo"]
+        self.__initColors(termhogConfig["colors"])
         self.__initWins()
     
     
@@ -101,6 +102,15 @@ class TermHog:
         win.erase()
         win.refresh()
     
+    
+    def displayLogo(self) -> None:
+        win = self.wins["process"]
+        win.erase()
+        try:
+            win.addstr(0, 0, self.__logo, curses.color_pair(7))
+        except: pass
+        win.refresh()
+    
     def exampleTest(self) -> None:
         """Prints all message types
         """
@@ -112,6 +122,15 @@ class TermHog:
         self.done(text)
         self.fatal(text)
     
+    def pressEnterTo(self, what:str) -> None:
+        """Waits for the user to press any button
+
+        Args:
+            what (str): displayed reason
+        """
+        self.info(f"Press any button to {what} ...")
+        while self.wins["input"].getch() != 10:
+            pass
     
     def wantToStopProcess(self) -> bool:
         """Says if user wants to stop process
@@ -127,6 +146,9 @@ class TermHog:
     def progressbar(self, iterable, iterLen:int, processName:str="PROCESS", start:int=None):
         return Progressbar(self.wins["process"], iterable, iterLen, processName, start)
 
+    def progressEnding(self):
+        self.pressEnterTo("continue")
+        self.displayLogo()
 
     def input(self, allowEmpty:bool=False) -> str:
         """Takes string data from user
@@ -138,6 +160,7 @@ class TermHog:
             str: string from user
         """
         win = self.wins["input"]
+        win.move(0, 0)
         result = ""
         
         while not result:

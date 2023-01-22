@@ -49,3 +49,4 @@ def refresh(wp:Workplace, cmd:Command):
     else:
         wp.hog.info(f"Already up to date.")
     wp.hog.done("Refreshed.")
+    wp.hog.progressEnding()
