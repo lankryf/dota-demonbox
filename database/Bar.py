@@ -62,6 +62,20 @@ class Databar(Characters, Teams, Matches):
         return self.__cur
 
 
+    def searchFullNames(self, namePiece:str, tableName:str, limit:int=-1) -> list[str]:
+        """Searches full name by name piece. Can be used as inexact searcher
+
+        Args:
+            namePiece (str): Piece of name that should be use for searching
+            tableName (str): Name of table in which will search
+
+        Returns:
+            list[str]: List of full names
+        """
+        self.__cur.execute(f'SELECT name FROM {tableName} WHERE name LIKE "%{namePiece}%" LIMIT {limit}')
+        return [row[0] for row in self.__cur.fetchall()]
+
+
     def migrate(self):
         """Migrates all from migrations.py
         """

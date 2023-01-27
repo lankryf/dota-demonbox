@@ -57,7 +57,7 @@ migrations = (
 
 '''CREATE TABLE IF NOT EXISTS "teams" (
 	"team_id"	INTEGER NOT NULL,
-	"tiny_name"	INTEGER DEFAULT NULL,
+	"tiny_name"	TEXT DEFAULT NULL,
 	PRIMARY KEY("team_id" AUTOINCREMENT)
 );
 ''',
@@ -65,7 +65,7 @@ migrations = (
 '''CREATE TABLE IF NOT EXISTS "teams_names" (
 	"team_name_id"	INTEGER NOT NULL,
 	"team_id"	REFERENCES teams (team_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	"name"	INTEGER NOT NULL UNIQUE,
+	"name"	TEXT NOT NULL UNIQUE,
 	PRIMARY KEY("team_name_id" AUTOINCREMENT)
 );
 '''

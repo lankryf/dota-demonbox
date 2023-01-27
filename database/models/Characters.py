@@ -68,6 +68,18 @@ class Characters():
         """
         self.cur.execute("INSERT INTO characters_names(character_id, name) VALUES(?,?)", (characterId, name))
 
+    def characterCount(self) -> int:
+        """Count of characters
+
+        Returns:
+            int: Count of characters
+        """
+        self.cur.execute("SELECT COUNT(*) FROM characters")
+        return self.cur.fetchall()[0][0]
+
+    def characterMaxId(self) -> int:
+        self.cur.execute("SELECT MAX(character_id) FROM characters")
+        return self.cur.fetchall()[0][0]
 
     def characterFusionAndDelete(self, oldCharId:int, newCharId:int) -> None:
         """Deletes character from database and gives it's names to another

@@ -68,6 +68,18 @@ class Teams:
         """
         self.cur.execute("INSERT INTO teams_names(team_id, name) VALUES(?,?)", (teamId, name))
     
+    def teamCount(self) -> int:
+        """Count of teams
+
+        Returns:
+            int: Count of teams
+        """
+        self.cur.execute("SELECT COUNT(*) FROM teams")
+        return self.cur.fetchall()[0][0]
+    
+    def teamMaxId(self) -> int:
+        self.cur.execute("SELECT MAX(team_id) FROM teams")
+        return self.cur.fetchall()[0][0]
     
     def teamFusionAndDelete(self, oldTeamId:int, newTeamId:int) -> None:
         """Deletes team from database and gives it's names to another
