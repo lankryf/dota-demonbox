@@ -14,9 +14,17 @@
 
 
 from requests import get
-from tools.stringwiz import stringsInside
+from tools.stringwiz import findallWithFunc, directString
 from tools.threadbooster import ThreadBooster
 from tools.Matches.types import Match, Game, DraftStr
+
+from bs4 import BeautifulSoup
+
+
+def normalizeName(text:str) -> str:
+    return directString(
+        BeautifulSoup(text.replace("&amp;", '&'),'html.parser').get_text()
+    ).replace(' ', '_')
 
 
 
@@ -24,7 +32,7 @@ class Escorenews(ThreadBooster):
     
     @staticmethod
     def getInputs(pageNumber:int) -> list[str]:
-        return stringsInside(get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text, '<a class="article v_gl582" href="', '">')
+        return findallWithFunc(r'<a class="article v_gl582" href="(.*?)">', get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text)
     
 
     @staticmethod
@@ -34,8 +42,8 @@ class Escorenews(ThreadBooster):
 
         #getting scores
         scores = [
-            stringsInside(page, '<span rel="t1" class="team green">', '</span>', lambda x: x.lower()),
-            stringsInside(page, '<span rel="t2" class="team red">', '</span>', lambda x: x.lower())
+            findallWithFunc(r'<span rel="t1" class="team green">(.*?)</span>', page, lambda x: x.lower()),
+            findallWithFunc(r'<span rel="t2" class="team red">(.*?)</span>', page, lambda x: x.lower())
             ]
         # skip if it is empty match
         if not len(scores[0]):
@@ -44,29 +52,25 @@ class Escorenews(ThreadBooster):
         
         #getting drafts and scores
         games = []
-        sides = [stringsInside(page, f'<div class="heroes t{side}">', '</div>') for side in range(1, 3)]
+        sides = [findallWithFunc(fr'<div class="heroes t{side}">(.*?)</div>', page) for side in range(1, 3)]
         for gameNumber in range(len(sides[0])):
             games.append(Game(
                 [DraftStr(
-                    stringsInside(side[gameNumber],
-                               '<picture class="hero tt" title="', '">',
-                               lambda x: x.lower())) for side in sides
+                    findallWithFunc(
+                        r'<picture class="hero tt" title="(.*?)">',
+                        side[gameNumber],
+                        lambda x: normalizeName(x.lower())
+                    )
+                ) for side in sides
                 ],
                 0 if scores[0][:3] == "<u>" else 1
             ))
 
 
-        #remove tage from team name
-        def removeTag(text:str) -> str:
-            if text[:3] == "<u>":
-                return text[3:-4]
-            return text
-
-
         #getting team names
         teamsNames = []
         for score in scores:
-            teamsNames.append(removeTag(score[0]))
+            teamsNames.append(normalizeName(score[0]))
 
 
         #postprocessing
@@ -75,7 +79,7 @@ class Escorenews(ThreadBooster):
             teams = [None, None]
             #replace incorrect team names
             for scoresNumber in range(len(scores)):
-                scoreNoTag = removeTag(scores[scoresNumber][gameNumber])
+                scoreNoTag = normalizeName(scores[scoresNumber][gameNumber])
                 if scoreNoTag in teamsNames:
                     teams[scoresNumber] = scoreNoTag
             if None in teams:

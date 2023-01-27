@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-def stringsInside(text:str, start:str, end:str, funcForInsides=lambda x: x) -> list[str]:
+from re import findall
+
+def findallWithFunc(patern:str, text:str, funcForInsides=lambda x: x) -> list[str]:
     """Gets text inside patterns (start, end) without including patterns.
     Has transformation functioin for each result inside list.
 
@@ -25,4 +27,15 @@ def stringsInside(text:str, start:str, end:str, funcForInsides=lambda x: x) -> l
     Returns:
         list[str]: List of results
     """
-    return [funcForInsides(t.split(end, 1)[0]) for t in text.split(start)[1:]]
+    return [funcForInsides(inside) for inside in findall(patern, text)]
+
+def directString(text:str) -> str:
+    """Returns text without useless spaces on both sides
+
+    Args:
+        text (str): Source text
+
+    Returns:
+        str: Result text
+    """
+    return findall(r'\A\s*(.*?)\s*\Z', text)[0]
