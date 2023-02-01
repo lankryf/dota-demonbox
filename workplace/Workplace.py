@@ -19,10 +19,10 @@ from json import load as jsonLoad
 #for commands
 from os import listdir, path as ospath
 from importlib import import_module
+from workplace.Advisor import Advisor
 
 # terminal interface
-from tools.termhog import TermHog
-from tools.Workplace.Command import Command
+from tools.Termhog.termhog import Termhog
 
 # database
 from database.Bar import Databar
@@ -31,17 +31,18 @@ from database.Bar import Databar
 from tools.tasks import Tasks
 
 
-class Workplace:
+class Workplace(Advisor):
     def __init__(self, configsPath:str="configs") -> None:
         self.__configsPath = configsPath
+        self.__work = True
         self.__setup()
 
 
     def __setup(self):
         # init termhog
-        with open(self.__configsPath + "/termhog.json", "r") as f:
-            self.hog = TermHog(jsonLoad(f))
-        self.hog.ok("TermHog has been loaded.")
+        with open("tools/Termhog/Themes/8colors.json", "r") as f:
+            self.hog = Termhog(jsonLoad(f))
+        self.hog.ok("TermHog has been started.")
         
         self.hog.displayLogo()
         
@@ -55,7 +56,12 @@ class Workplace:
         
         self.__config = ConfigParser()
         self.__config.read(configiniPath)
+
+        with open(self.__config["termhog"]["themeFilePath"], "r") as f:
+            self.hog.adjust(jsonLoad(f))
+
         self.hog.ok("Config has been read.")
+        self.hog.ok("TermHog theme was set")
 
         # load database
         self.bar = Databar(self.__config["database"]["path"], self.__config["database"]["backupsFolder"])
@@ -77,25 +83,42 @@ class Workplace:
 
         
     def __initCommands(self):
-        self.commands = {}
-        folder = self.__config['commands']['path']
+        self.__commands = {}
+        self.__commandsNames = []
+        
+        folder = self.__config['commands']['folder']
         for name in listdir(folder):
             if ospath.isdir(f"{folder}/{name}"):
                 continue
             name = name[:-3]
-            self.commands[name] = getattr(import_module(f"{folder.replace('/', '.')}.{name}"), name)
+            lowerName = name.lower()
+            self.__commands[lowerName] = getattr(import_module(f"{folder.replace('/', '.')}.{name}"), name)
+            self.__commandsNames.append(lowerName)
+        self.__commandsNames.sort()
 
+
+    @property
+    def commandsNames(self) -> list[str]:
+        return self.__commandsNames
+    
+    @property
+    def commands(self) -> dict[object]:
+        return self.__commands
+    
+    def stop(self) -> None:
+        self.__work = False
 
     def inputLoop(self):
-        work = True
-        while work:
-            cmd = Command(self.hog.input())
-            if cmd.name == "exit":
-                break
+        while self.__work:
+            cmd = self.inputCommand()
             if cmd.name not in self.commands:
                 self.hog.err(f'Command "{cmd.name}" is not found :(')
                 continue
             
             self.hog.space()
-            self.commands[cmd.name](self, cmd)
+            try:
+                self.commands[cmd.name].execute(self, cmd)
+            except Exception as e:
+                self.hog.fatal(str(e))
+
         self.__ending()

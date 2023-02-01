@@ -81,7 +81,7 @@ class Teams:
         self.cur.execute("SELECT MAX(team_id) FROM teams")
         return self.cur.fetchall()[0][0]
     
-    def teamFusionAndDelete(self, oldTeamId:int, newTeamId:int) -> None:
+    def teamFusionById(self, oldTeamId:int, newTeamId:int) -> None:
         """Deletes team from database and gives it's names to another
 
         Args:
@@ -94,3 +94,22 @@ class Teams:
             self.cur.execute(f"UPDATE matches SET team{teamNumber}_id = ? WHERE team{teamNumber}_id == ?", (newTeamId, oldTeamId))
         
         self.cur.execute("DELETE FROM teams WHERE team_id = ?", (oldTeamId,))
+    
+    def teamFusionByName(self, oldTeamName:str, newTeamName:str) -> None:
+        """Deletes team from database and gives it's names to another
+
+        Args:
+            oldTeamName (str): Name of team that should be deleted
+            newTeamName (str): Name of team that will take names
+        """
+        names = (oldTeamName, newTeamName)
+        self.cur.execute("SELECT name, team_id FROM teams_names WHERE name IN (?, ?)", names)
+        namesIds = self.cur.fetchall()
+        if len(namesIds) != 2:
+            return
+        namesIds = dict(namesIds)
+        self.teamFusionById(*[namesIds[name] for name in names])
+        
+    def teamAllNames(self, teamId:int) -> list[str]:
+        self.cur.execute("SELECT name from teams_names WHERE team_id == ?", (teamId,))
+        return [row[0] for row in self.cur.fetchall()]

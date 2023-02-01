@@ -81,7 +81,7 @@ class Characters():
         self.cur.execute("SELECT MAX(character_id) FROM characters")
         return self.cur.fetchall()[0][0]
 
-    def characterFusionAndDelete(self, oldCharId:int, newCharId:int) -> None:
+    def characterFusionById(self, oldCharId:int, newCharId:int) -> None:
         """Deletes character from database and gives it's names to another
 
         Args:
@@ -91,3 +91,22 @@ class Characters():
         for table in ('characters_names', 'drafts'):
             self.cur.execute(f"UPDATE {table} SET character_id = ? WHERE character_id == ?", (newCharId, oldCharId))
         self.cur.execute("DELETE FROM characters WHERE character_id = ?", (oldCharId,))
+
+    def characterFusionByName(self, oldCharName:str, newCharName:str) -> None:
+        """Deletes character from database and gives it's names to another
+
+        Args:
+            oldCharName (str): Name of character that should be deleted
+            newCharName (str): Name of character that will take names
+        """
+        names = (oldCharName, newCharName)
+        self.cur.execute("SELECT name, character_id FROM characters_names WHERE name IN (?, ?)", names)
+        namesIds = self.cur.fetchall()
+        if len(namesIds) != 2:
+            return
+        namesIds = dict(namesIds)
+        self.characterFusionById(*[namesIds[name] for name in names])
+        
+    def characterAllNames(self, charId:int) -> list[str]:
+        self.cur.execute("SELECT name from characters_names WHERE character_id == ?", (charId,))
+        return [row[0] for row in self.cur.fetchall()]

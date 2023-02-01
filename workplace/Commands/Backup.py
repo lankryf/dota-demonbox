@@ -12,8 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.Workplace.Workplace import Workplace
-from tools.Workplace.Command import Command
+from workplace.Commands.Common.CommandFather import *
 
-def clear(wp:Workplace, cmd:Command):
-    wp.hog.clear()
+class Backup(Father):
+
+    flags = ('c',)
+    hints = {None: ()}
+
+    @staticmethod
+    def body(wp:Workplace, cmd:Command):    
+        if 'c' in cmd.flags:
+            wp.bar.clearWithBackup()
+            wp.hog.ok("Backuped and cleared.")
+        else:
+            wp.bar.backup()
+            wp.hog.ok("Backuped.")

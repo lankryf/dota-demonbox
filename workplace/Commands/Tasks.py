@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.Workplace.Workplace import Workplace
-from tools.Workplace.Command import Command
+from workplace.Commands.Common.CommandFather import *
 
-def tasks(wp:Workplace, cmd:Command):
-    if 'c' in cmd.flags:
-        wp.tasks.clear()
-        wp.tasks.save()
-        wp.hog.ok("Cleared!")
-    else:
-        wp.hog.info("There is no function here :)")
+
+
+class Tasks(Father):
+
+    flags = ('c',)
+    hints = {None: ()}
+
+    @staticmethod
+    def body(wp:Workplace, cmd:Command):
+        if 'c' in cmd.flags:
+            wp.tasks.clear()
+            wp.tasks.save()
+            wp.hog.ok("Cleared!")
+        else:
+            wp.hog.info("There is no function here :)")

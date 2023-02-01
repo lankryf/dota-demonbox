@@ -91,17 +91,23 @@ class Matches:
         self.cur.execute("DELETE FROM matches WHERE match_id = ?", (matchId,))
 
 
-    def matchAdd(self, match:Match):
+    def matchAdd(self, match:Match) -> bool:
         """Adds match to database
 
         Args:
             match (Match): Match that should be added
+
+        Returns:
+            bool: True if added else False
         """
         #insert match and teams
-        self.cur.execute(
-            "INSERT INTO matches(link, team1_id, team2_id) VALUES(?,?,?) RETURNING match_id",
-            (match.link, *[self.teamIdAnyways(name) for name in match.teams])
-        )
+        try:
+            self.cur.execute(
+                "INSERT INTO matches(link, team1_id, team2_id) VALUES(?,?,?) RETURNING match_id",
+                (match.link, *[self.teamIdAnyways(name) for name in match.teams])
+            )
+        except:
+            return False
         matchId = self.cur.fetchall()[0][0]
         
         #inert games and drafts
@@ -117,3 +123,4 @@ class Matches:
                         "INSERT INTO drafts(game_id, team, character_id) VALUES(?,?,?)",
                         (gameId, teamNumber, characterId)
                     )
+        return True

@@ -1,0 +1,7 @@
+*
+!.gitignore
+
+# default themes
+!8colors.json
+!16colors.json
+!256colors.json

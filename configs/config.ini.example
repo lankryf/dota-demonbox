@@ -3,7 +3,11 @@ path = database/data.db
 backupsFolder = database/backups
 
 [commands]
-path = tools/Workplace/Commands
+folder = workplace/Commands
+
+[hog]
+themeFilePath = tools/Termhog/Themes/8colors.json
+
 
 [processing]
 threadCount=8
