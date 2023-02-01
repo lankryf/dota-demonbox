@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from re import findall
+import re
 
 def findallWithFunc(patern:str, text:str, funcForInsides=lambda x: x) -> list[str]:
     """Gets text inside patterns (start, end) without including patterns.
@@ -27,7 +27,7 @@ def findallWithFunc(patern:str, text:str, funcForInsides=lambda x: x) -> list[st
     Returns:
         list[str]: List of results
     """
-    return [funcForInsides(inside) for inside in findall(patern, text)]
+    return [funcForInsides(inside) for inside in re.findall(patern, text, flags=re.DOTALL)]
 
 def directString(text:str) -> str:
     """Returns text without useless spaces on both sides
@@ -38,4 +38,4 @@ def directString(text:str) -> str:
     Returns:
         str: Result text
     """
-    return findall(r'\A\s*(.*?)\s*\Z', text)[0]
+    return re.findall(r'\A\s*(.*?)\s*\Z', text, flags=re.DOTALL)[0]
