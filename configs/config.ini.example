@@ -5,10 +5,11 @@ backupsFolder = database/backups
 [commands]
 folder = workplace/Commands
 
-[hog]
+[termhog]
 themeFilePath = tools/Termhog/Themes/8colors.json
 
+[getter]
+clasterSize = 5
 
 [processing]
-threadCount=8
 taskFilePath = configs/tasks.json

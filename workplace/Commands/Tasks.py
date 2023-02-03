@@ -26,6 +26,6 @@ class Tasks(Father):
         if 'c' in cmd.flags:
             wp.tasks.clear()
             wp.tasks.save()
-            wp.hog.ok("Cleared!")
+            wp.hog.ok("Tasks have been cleared!")
         else:
             wp.hog.info("There is no function here :)")

@@ -30,6 +30,7 @@ from database.Bar import Databar
 # tasks
 from tools.tasks import Tasks
 
+from traceback import format_exc
 
 class Workplace(Advisor):
     def __init__(self, configsPath:str="configs") -> None:
@@ -119,6 +120,6 @@ class Workplace(Advisor):
             try:
                 self.commands[cmd.name].execute(self, cmd)
             except Exception as e:
-                self.hog.fatal(str(e))
+                self.hog.fatal(format_exc())
 
         self.__ending()

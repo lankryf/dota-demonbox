@@ -14,21 +14,21 @@
 import curses
 
 class Progressbar:
-        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str, start:int=None, borders=True):
+        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str, start:int=None, step:int=1, borders=True):
             self.__win = win
             self.__width  = win.getmaxyx()[1]-2
             self.__name = processName
-            self.__iterLen = iterLen
             self.__iterable = iterable
             self.__barNow = 1
-            self.__oneStep = iterLen / self.__width
-            
-            self.__draw(borders)
-            
+            self.__iterLen = iterLen // step
+            self.__progressbarStep = self.__iterLen / self.__width
             self.__start = 1
+
+            self.__draw(borders)
+
             if start is not None:
-                self.__start += start
-                self.__makeStep(start)
+                self.__start = start // step
+                self.__makeStep(self.__start)
             
         
         def __draw(self, borders=True):
@@ -44,8 +44,9 @@ class Progressbar:
             self.__win.refresh()
         
         def __moveBar(self, newBarPosition:int):
-            self.__win.addstr(1, self.__barNow, "#"*(newBarPosition - self.__barNow), curses.color_pair(2))
-            self.__barNow = newBarPosition
+            if newBarPosition <= self.__width:
+                self.__win.addstr(1, self.__barNow, "#"*(newBarPosition - self.__barNow), curses.color_pair(2))
+                self.__barNow = newBarPosition
 
         def __done(self):
             self.__win.addstr(2, 1, str(self.__iterLen))
@@ -53,7 +54,7 @@ class Progressbar:
             self.__drawBar("#", 2)
 
         def __makeStep(self, n:int):
-            newBarPosition = int(n // self.__oneStep)
+            newBarPosition = int(n // self.__progressbarStep)
             if newBarPosition > self.__barNow:
                 self.__moveBar(newBarPosition)
             self.__win.addstr(2, 1, str(n))
@@ -62,19 +63,6 @@ class Progressbar:
         def __iter__(self):
             for n, i in enumerate(self.__iterable, self.__start):
                 yield i
-                self.__makeStep(n)
-            
-            self.__done()
-        
-        def withEnumerate(self):
-            """_summary_
-
-            Yields:
-                int: Enumerating from 1
-                any: Current object
-            """
-            for n, i in enumerate(self.__iterable, self.__start):
-                yield n, i
                 self.__makeStep(n)
             
             self.__done()
@@ -285,8 +273,8 @@ class Termhog:
         return False
 
 
-    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS", start:int=None) -> Progressbar:
-        return Progressbar(self.wins["process"], iterable, iterLen, processName, start, self.__borders)
+    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS", start:int=None, step:int=1) -> Progressbar:
+        return Progressbar(self.wins["process"], iterable, iterLen, processName, start, step, self.__borders)
 
     def menu(self) -> Menu:
         return Menu(self.wins["gen"])

@@ -73,7 +73,7 @@ class CommandFactory:
         return sum((len(arg) for arg in self.__all)) + len(self.__all) - 1
     
     def addChar(self, character:str) -> None:
-        if character == ' ':
+        if character == ' ' and self.__all[0]:
             self.__all.append('')
             return
         self.__all[-1] += character

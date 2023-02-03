@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from tools.Matches.types import Match, Game
+from sqlite3 import IntegrityError
 
 class Matches:
     """Matches include games, drafts
@@ -106,8 +107,10 @@ class Matches:
                 "INSERT INTO matches(link, team1_id, team2_id) VALUES(?,?,?) RETURNING match_id",
                 (match.link, *[self.teamIdAnyways(name) for name in match.teams])
             )
-        except:
-            return False
+        except Exception as e:
+            if isinstance(e, IntegrityError):
+                return False
+            raise e
         matchId = self.cur.fetchall()[0][0]
         
         #inert games and drafts
