@@ -36,7 +36,7 @@ class DraftStr(Draft):
         """
         self._draftList.append(characterName)
     
-    def stringsList(self) -> list[str]:
+    def stringsList(self, *args) -> list[str]:
         """Draft's list as strings
 
         Returns:
@@ -65,7 +65,7 @@ class DraftId(Draft):
         """
         self._draftList.append(characterId)
     
-    def idsList(self) -> list[int]:
+    def idsList(self, *args) -> list[int]:
         """Draft's list as ids
 
         Returns:

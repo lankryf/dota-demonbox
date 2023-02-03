@@ -24,12 +24,13 @@ class Greatload(Father):
     @staticmethod
     def body(wp:Workplace, cmd:Command):
         
-        getter = Escorenews(wp.config.getint("processing", "threadCount"))
+        getter = Escorenews(waitingTime=2)
         
         wp.hog.info("Getting last page ...")
         lastPage = getter.getLastPageNumber()
         wp.hog.ok(f"Last page is {lastPage}")
         
+        # loads a task if it exists
         if wp.tasks.hasCurrentTask() and wp.tasks.currentTask[0] == cmd.name:
             starting = lastPage - wp.tasks.currentTask[1][0]
         else:
@@ -39,34 +40,41 @@ class Greatload(Father):
 
         wp.hog.info(f"We will start from {starting}")
 
-        for pageNumber in wp.hog.progressbar(range(starting, 0, -1), lastPage, "GREATLOAD", lastPage - starting):
+        clasterSize = wp.config.getint("getter", "clasterSize")
+        wp.hog.info(f"Claster size is {clasterSize}")
+
+        clasterNumbers = None
+        wp.hog.info(f"Starting ...")
+        for clasterStart in wp.hog.progressbar(range(starting, 0, -clasterSize), lastPage, "GREATLOAD", lastPage - starting, step=5):
             
             if wp.hog.wantToStopProcess():
                 break
             
-            getter.loadInput(pageNumber)
-            for result in getter:
-                for match in result:
-                    added = wp.bar.matchAdd(match)
-                    if not added:
-                        wp.hog.info(f'Match with link "{match.link}" is already in the database')
+            clasterNumbers = tuple(range(clasterStart, max(0, clasterStart-clasterSize), -1))
+
+            data = getter.getTrueResults(clasterNumbers)
+            for match in data:
+                added = wp.bar.matchAdd(match)
+                if not added:
+                    wp.hog.info(f'Match with link "{match.link}" is already in the database')
 
 
-                message = f"Page parsed: {pageNumber}"
-                if result:
-                    wp.bar.commit()
-                    wp.hog.ok(message)
-                else:
-                    wp.hog.err(message)
+            if data:
+                wp.bar.commit()
+                wp.hog.ok(f"Claster {clasterNumbers} : {len(data)} matches")
+            else:
+                wp.hog.err(f"Claster {clasterNumbers} : empty")
 
-
-        if pageNumber > 1:
-            wp.tasks.setCurrentTask(cmd.name, lastPage - pageNumber)
+        if not clasterNumbers is None:
+            if clasterNumbers[-1] > 1:
+                wp.tasks.setCurrentTask(cmd.name, lastPage - clasterNumbers[-1] + 1)
+            else:
+                wp.tasks.clear()
+            wp.tasks.save()
+            wp.hog.ok("Task has been saved!")
         else:
-            wp.tasks.clear()
-        wp.tasks.save()
-        wp.hog.ok("Task has been saved!")
+            wp.hog.info("Nothing was done, task has stayed the same.")
         
         
         wp.hog.done("Greatload has been done!")
-        
+        wp.hog.progressEnding()

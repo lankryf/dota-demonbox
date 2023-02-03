@@ -15,7 +15,7 @@
 
 from requests import get
 from tools.stringwiz import findallWithFunc, directString
-from tools.threadbooster import ThreadBooster
+from tools.AsyncBoosted import AsyncBoosted
 from tools.Matches.types import Match, Game, DraftStr
 
 from bs4 import BeautifulSoup
@@ -28,18 +28,26 @@ def normalizeName(text:str) -> str:
 
 
 
-class Escorenews(ThreadBooster):
+class Escorenews(AsyncBoosted):
     
+    # Modifiers
     @staticmethod
-    def getInputs(pageNumber:int) -> list[str]:
-        return findallWithFunc(r'<a class="article v_gl582" href="(.*?)">', get(f"https://escorenews.com/en/dota-2/matches?s2={pageNumber}").text)
-    
+    def sheetLinkModifier(linkPart) -> str:
+        return f"https://escorenews.com/en/dota-2/matches?s2={linkPart}"
+    @staticmethod
+    def pageLinkModifier(linkPart) -> str:
+        return "https://escorenews.com/" + linkPart
+
+
+
+    # Getter functions
+    @staticmethod
+    def getPagesFromSheet(link:str, *_) -> list[str]:
+        return findallWithFunc(r'<a class="article v_gl582" href="(.*?)">', link)
 
     @staticmethod
-    def getResult(multithreads, matchLinkAddition:str):
-        page = get("https://escorenews.com/" + matchLinkAddition).text
-
-
+    def getResultFromPage(page:str, link:str):
+        
         #getting scores
         scores = [
             findallWithFunc(r'<span rel="t1" class="team green">(.*?)</span>', page, lambda x: x.lower()),
@@ -90,8 +98,10 @@ class Escorenews(ThreadBooster):
             if teams != teamsNames:
                 games[gameNumber].reverse()
         
-        multithreads._addResult(Match(games, matchLinkAddition, teamsNames))
+        return Match(games, link, teamsNames)
 
+
+    # Additional functions
 
     @staticmethod
     def pageExists(pageNumber:int):
