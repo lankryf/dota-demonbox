@@ -25,6 +25,11 @@ class Getinfo(Father):
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
+
+        if cmd.mode is None:
+            wp.hog.info("There is nothing to do :)")
+            return
+
         funcs = {
             "char": (
                 wp.bar.characterIdByName,
