@@ -28,4 +28,5 @@ class Tasks(Father):
             wp.tasks.save()
             wp.hog.ok("Tasks have been cleared!")
         else:
-            wp.hog.info("There is no function here :)")
+            wp.hog.info(f"Current task: {wp.tasks.currentTask[0]}")
+            wp.hog.info(f"Current task args: {wp.tasks.currentTask[1]}")
