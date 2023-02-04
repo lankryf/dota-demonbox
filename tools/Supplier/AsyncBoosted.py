@@ -14,11 +14,12 @@
 
 
 import asyncio, aiohttp
-
+from tools.Supplier.Proxima import Proxima
 
 class AsyncBoosted:
-    def __init__(self, waitingTime:float|int=2):
+    def __init__(self, waitingTime:float|int=2, proxima:Proxima=Proxima()):
         self.waitingTime = waitingTime
+        self.__proxima = proxima
 
     @staticmethod
     def sheetLinkModifier(link:str) -> str:
@@ -59,10 +60,12 @@ class AsyncBoosted:
         status = 500
         result = ''
         while status != 200:
-            async with session.get(link) as response:
-                status = response.status
-                if status == 200:
-                    result = await response.text()
+            try:
+                async with session.get(link, proxy=self.__proxima.getProxy()) as response:
+                    status = response.status
+                    if status == 200:
+                        result = await response.text()
+            except: pass
             await asyncio.sleep(self.waitingTime)
 
         return func(result, link)

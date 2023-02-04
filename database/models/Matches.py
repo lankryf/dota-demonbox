@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.Matches.types import Match, Game
+from tools.Supplier.types import Match, Game
 from sqlite3 import IntegrityError
 
 class Matches:

@@ -14,7 +14,8 @@
 
 from workplace.Commands.Common.CommandFather import *
 
-from tools.Matches.getter import Escorenews
+from tools.Supplier.getters.Escorenews import Escorenews
+from tools.Supplier.Proxima import Proxima
 
 class Greatload(Father):
 
@@ -24,7 +25,16 @@ class Greatload(Father):
     @staticmethod
     def body(wp:Workplace, cmd:Command):
         
-        getter = Escorenews(waitingTime=2)
+        proxima = Proxima(wp.web.proxies)
+        if proxima.isEmpty():
+            wp.hog.warn("There are no proxies, greatload will be slow")
+        else:
+            allproxies = len(proxima)
+            proxima.setWorkingOnly(Escorenews.sheetLinkModifier(1))
+            wp.hog.info(f"Proxies that work {len(proxima)}/{allproxies}")
+            del allproxies
+
+        getter = Escorenews(waitingTime=2, proxima=proxima)
         
         wp.hog.info("Getting last page ...")
         lastPage = getter.getLastPageNumber()

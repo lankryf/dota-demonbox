@@ -14,7 +14,7 @@
 
 from workplace.Commands.Common.CommandFather import *
 
-from tools.Matches.getter import Escorenews
+from tools.Supplier.getters.Escorenews import Escorenews
 
 
 class Refresh(Father):

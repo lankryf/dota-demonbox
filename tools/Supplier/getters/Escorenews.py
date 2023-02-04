@@ -14,17 +14,12 @@
 
 
 from requests import get
-from tools.stringwiz import findallWithFunc, directString
-from tools.AsyncBoosted import AsyncBoosted
-from tools.Matches.types import Match, Game, DraftStr
 
-from bs4 import BeautifulSoup
+from tools.Supplier.AsyncBoosted import AsyncBoosted
+from tools.Supplier.types import Match, Game, DraftStr
 
-
-def normalizeName(text:str) -> str:
-    return directString(
-        BeautifulSoup(text.replace("&amp;", '&'),'html.parser').get_text()
-    ).replace(' ', '_')
+from tools.stringwiz import findallWithFunc
+from tools.Supplier.supptools import normalizeName, hasOneSimilar
 
 
 
@@ -71,32 +66,31 @@ class Escorenews(AsyncBoosted):
                     )
                 ) for side in sides
                 ],
-                0 if scores[0][:3] == "<u>" else 1
+                0 if scores[0][gameNumber][:3] == "<u>" else 1
             ))
 
 
         #getting team names
         teamsNames = []
-        for score in scores:
-            teamsNames.append(normalizeName(score[0]))
+        for y, score in enumerate(scores):
+            for x, teamName in enumerate(score):
+                scores[y][x] = normalizeName(teamName)
+            teamsNames.append(score[0])
 
 
-        #postprocessing
-        for gameNumber in range(1, len(games)):
+        # postprocessing
 
-            teams = [None, None]
-            #replace incorrect team names
-            for scoresNumber in range(len(scores)):
-                scoreNoTag = normalizeName(scores[scoresNumber][gameNumber])
-                if scoreNoTag in teamsNames:
-                    teams[scoresNumber] = scoreNoTag
-            if None in teams:
-                noneIndex = teams.index(None)
-                teams[noneIndex] = [name for name in teamsNames if name != teams[1-noneIndex]][0]
 
+        for gameNumber, gameTeamName in enumerate(zip(*scores)):
+            # zipping as [teamName1, teamName2]
+            #trace incorrect team names
             #reverce sides if it's wanted
-            if teams != teamsNames:
+            if hasOneSimilar(teamsNames, gameTeamName):
+                continue
+            if hasOneSimilar(teamsNames, reversed(gameTeamName)):
                 games[gameNumber].reverse()
+                continue
+            return # if 2 names is not like first ones, we skip match
         
         return Match(games, link, teamsNames)
 

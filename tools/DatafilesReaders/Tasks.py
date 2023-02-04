@@ -12,23 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from json import load, dump
-from os import path as ospath
+from tools.DatafilesReaders.Reader import Reader
 
 
-class Tasks:
-    def __init__(self, taskFilePath:str) -> None:
-        self.__path = taskFilePath
-        if ospath.exists(self.__path):
-            with open(self.__path, "r") as f:
-                self.__tasksData = load(f)
-        else:
-            self.clear()
-            self.save()
-
-
-    def __getattr__(self, name):
-        return self.__tasksData[name]
+class Tasks(Reader):
 
     def hasCurrentTask(self) -> bool:
         """Does tasks have current task
@@ -41,7 +28,7 @@ class Tasks:
     def clear(self) -> None:
         """Clears tasks
         """
-        self.__tasksData = {
+        self._data = {
             "currentTask": []
         }
     
@@ -52,10 +39,4 @@ class Tasks:
             taskName (str): Task's name
             *args (any): arguments that should be given to current task
         """
-        self.__tasksData["currentTask"] = [taskName, args]
-
-    def save(self) -> None:
-        """Saves changes to file
-        """
-        with open(self.__path, "w") as f:
-            dump(self.__tasksData, f, indent=4)
+        self._data["currentTask"] = [taskName, args]

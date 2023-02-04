@@ -27,8 +27,9 @@ from tools.Termhog.termhog import Termhog
 # database
 from database.Bar import Databar
 
-# tasks
-from tools.tasks import Tasks
+# datareaders
+from tools.DatafilesReaders.Tasks import Tasks
+from tools.DatafilesReaders.Web import Web
 
 from traceback import format_exc
 
@@ -53,11 +54,10 @@ class Workplace(Advisor):
             self.hog.fatal(f"Config file {configiniPath} is not exsist.\nPlease, create it using config.ini.example.")
             self.hog.pressEnterTo("exit")
             raise(FileNotFoundError(configiniPath))
-            
-        
         self.__config = ConfigParser()
         self.__config.read(configiniPath)
 
+        # refresh termhog theame
         with open(self.__config["termhog"]["themeFilePath"], "r") as f:
             self.hog.adjust(jsonLoad(f))
 
@@ -68,8 +68,9 @@ class Workplace(Advisor):
         self.bar = Databar(self.__config["database"]["path"], self.__config["database"]["backupsFolder"])
         self.hog.ok("Database has been opened.")
 
-        # load tasks
+        # Data readers
         self.tasks = Tasks(self.__config["processing"]["taskFilePath"])
+        self.web = Web(self.__config["web"]["webFilePath"])
 
         self.__initCommands()
     

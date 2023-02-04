@@ -11,5 +11,8 @@ themeFilePath = tools/Termhog/Themes/8colors.json
 [getter]
 clasterSize = 5
 
+[web]
+webFilePath = configs/web.json
+
 [processing]
 taskFilePath = configs/tasks.json

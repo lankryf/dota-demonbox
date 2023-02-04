@@ -14,5 +14,6 @@
 
 from workplace.Workplace import Workplace
 
-workplace = Workplace("configs")
-workplace.inputLoop()
+if __name__ == "__main__":
+    workplace = Workplace("configs")
+    workplace.inputLoop()
