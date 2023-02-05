@@ -16,11 +16,13 @@ import asyncio, aiohttp
 
 
 class Proxima:
-    def __init__(self, proxies:list[str] = []):
+    def __init__(self, proxies:list[str] = [], withMe:bool=True):
         self.__proxies = proxies
         if self.isEmpty():
             self.getProxy = lambda: None
         else:
+            if withMe:
+                self.__proxies.append(None)
             self.reset()
     
     def __len__(self) -> int:

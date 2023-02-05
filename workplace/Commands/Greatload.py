@@ -25,7 +25,7 @@ class Greatload(Father):
     @staticmethod
     def body(wp:Workplace, cmd:Command):
         
-        proxima = Proxima(wp.web.proxies)
+        proxima = Proxima(wp.web.proxies, withMe=True)
         if proxima.isEmpty():
             wp.hog.warn("There are no proxies, greatload will be slow")
         else:
