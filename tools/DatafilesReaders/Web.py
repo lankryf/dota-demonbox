@@ -22,3 +22,6 @@ class Web(Reader):
         self._data = {
             "proxies": []
         }
+    
+    def setProxies(self, proxyList:list[str]):
+        self._data["proxies"] = proxyList

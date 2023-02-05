@@ -46,10 +46,11 @@ class Proxima:
                 ]
             )
 
-    def checkNonWorking(self, linkForCheck:str) -> list[str]:
-        return [
-            proxy for proxy, working in asyncio.run(self.__checkAllProxies(linkForCheck)) if not working
-        ]
+    def checkWorking(self, linkForCheck:str) -> list[str]:
+        proxylist = [[], []]
+        for proxy, working in asyncio.run(self.__checkAllProxies(linkForCheck)):
+            proxylist[int(working)].append(proxy)
+        return proxylist
     
     def setWorkingOnly(self, linkForCheck:str) -> None:
         self.__proxies = [

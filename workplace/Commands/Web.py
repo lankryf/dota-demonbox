@@ -14,13 +14,29 @@
 
 from workplace.Commands.Common.CommandFather import *
 
-
+from tools.Supplier.Proxima import Proxima
 
 class Web(Father):
 
-    flags = ()
-    hints = {None: ()}
+    flags = ('f')
+    hints = {None: (), "proxycheck": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-        wp.hog.info(f"Proxies: {wp.web.proxies}")
+        match cmd.mode:
+            case None:
+                wp.hog.info(f"Proxies: {wp.web.proxies}")
+            
+            case "proxycheck":
+                proxima = Proxima(wp.web.proxies)
+                nonworking, working = proxima.checkWorking("https://www.google.com")
+                for proxy in nonworking:
+                    wp.hog.err(f"Proxy {proxy} isn't working")
+                wp.hog.info(f"Proxies that work {len(working)}/{len(proxima)}")
+
+                if 'f' in cmd.flags:
+                    wp.web.setProxies(working)
+                    wp.web.save()
+                    wp.hog.ok("Proxies have been fixed!")
+                
+                wp.hog.done("Proxy checking has been done.")
