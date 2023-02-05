@@ -17,12 +17,10 @@ import asyncio, aiohttp
 
 class Proxima:
     def __init__(self, proxies:list[str] = [], withMe:bool=True):
-        self.__proxies = proxies
+        self.__proxies = proxies + [None] if withMe else []
         if self.isEmpty():
             self.getProxy = lambda: None
         else:
-            if withMe:
-                self.__proxies.append(None)
             self.reset()
     
     def __len__(self) -> int:
@@ -48,10 +46,11 @@ class Proxima:
                 ]
             )
 
-    def checkWorking(self, linkForCheck:str) -> list[str]:
+    def checkWorkingProxies(self, linkForCheck:str) -> list[str]:
         proxylist = [[], []]
         for proxy, working in asyncio.run(self.__checkAllProxies(linkForCheck)):
-            proxylist[int(working)].append(proxy)
+            if proxy:
+                proxylist[int(working)].append(proxy)
         return proxylist
     
     def setWorkingOnly(self, linkForCheck:str) -> None:
@@ -60,7 +59,7 @@ class Proxima:
         ]
 
     def isEmpty(self) -> bool:
-        return not self.__proxies
+        return not any(self.__proxies)
 
     def reset(self):
         self.__generator = (proxy for proxy in self.__proxies)

@@ -29,10 +29,10 @@ class Web(Father):
             
             case "proxycheck":
                 proxima = Proxima(wp.web.proxies)
-                nonworking, working = proxima.checkWorking("https://www.google.com")
+                nonworking, working = proxima.checkWorkingProxies("https://www.google.com")
                 for proxy in nonworking:
                     wp.hog.err(f"Proxy {proxy} isn't working")
-                wp.hog.info(f"Proxies that work {len(working)}/{len(proxima)}")
+                wp.hog.info(f"Proxies that work {len(working)}/{len(working)+len(nonworking)}")
 
                 if 'f' in cmd.flags:
                     wp.web.setProxies(working)
