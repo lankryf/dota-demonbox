@@ -14,10 +14,14 @@
 
 
 import sqlite3
-from datetime import datetime
 
+# for backups
+from tools.BackupsNerd import backupName
+
+# migrations
 from database.migrations import migrations
 
+# models
 from database.models.Characters import *
 from database.models.Teams import *
 from database.models.Matches import *
@@ -26,7 +30,7 @@ from database.models.Matches import *
 class Databar(Characters, Teams, Matches):
     def __init__(self, path, backupsFolder="database/backups"):
         self.__path = path
-        self.__backupsFolder = backupsFolder
+        self.__backupsFolder = backupsFolder + '/'
         
         self.__initConnectionAndCursor()
     
@@ -37,19 +41,19 @@ class Databar(Characters, Teams, Matches):
         self.__cur.execute("PRAGMA foreign_keys = ON")
     
     
-    def backup(self) -> None:
+    def backup(self, marked=False) -> None:
         """Backups database to backupsFolder with timestamp
         """
         self.__conn.commit()
-        backup = sqlite3.connect(self.__backupsFolder + datetime.now().strftime("/%d-%m-%y_%H-%M-%S.db"))
+        backup = sqlite3.connect(self.__backupsFolder + backupName('.db', marked))
         self.__conn.backup(backup)
         backup.close()
     
     
-    def clearWithBackup(self):
+    def clearWithBackup(self, marked=False):
         """Generates backup, clears database, migrate tables
         """
-        self.backup()
+        self.backup(marked)
         self.__conn.close()
         with open(self.__path, "w") as _:
             pass

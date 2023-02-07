@@ -14,12 +14,13 @@
 
 from workplace.Commands.Common.CommandFather import *
 
+from tools.BackupsNerd import BackupsNerd
 from sqlite3 import connect
 
 class Source(Father):
 
     flags = ()
-    hints = {None: ()}
+    hints = {None: (), "from": (None,)}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
@@ -31,8 +32,18 @@ class Source(Father):
                 "characters","characters_names",
                 "matches", "games", "drafts"]
         
-        wp.hog.info(f"Opening {cmd.args[0]} database.")
-        with connect(cmd.args[0]) as donor:
+        if cmd.mode == 'from':
+            donorfile = cmd.args[0]
+        else:
+            bnerd = BackupsNerd(wp.config['database']['backupsFolder'])
+            donorfile = bnerd.lastMarked()
+            if not donorfile:
+                wp.hog.fatal("There are no marked backups!")
+                return
+
+
+        wp.hog.info(f"Opening {donorfile} database.")
+        with connect(donorfile) as donor:
             donorcur = donor.cursor()
             
             for table in wp.hog.progressbar(tables, len(tables), "SOURCING"):

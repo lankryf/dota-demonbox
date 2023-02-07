@@ -16,14 +16,19 @@ from workplace.Commands.Common.CommandFather import *
 
 class Backup(Father):
 
-    flags = ('c',)
+    flags = ('c', 'm')
     hints = {None: ()}
 
     @staticmethod
-    def body(wp:Workplace, cmd:Command):    
+    def body(wp:Workplace, cmd:Command):
+        marked = False
+        if 'm' in cmd.flags:
+            wp.hog.info("This backup will be marked")
+            marked = True
+
         if 'c' in cmd.flags:
-            wp.bar.clearWithBackup()
+            wp.bar.clearWithBackup(marked)
             wp.hog.ok("Backuped and cleared.")
         else:
-            wp.bar.backup()
+            wp.bar.backup(marked)
             wp.hog.ok("Backuped.")
