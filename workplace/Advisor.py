@@ -15,16 +15,13 @@
 from workplace.Command import Command, CommandFactory
 import curses
 
+# TODO: make inputCommand depend on the inputWithAdvice
+def suitableList(wholeList:list[str], requirement:str) -> list[str]:
+    return [name for name in wholeList if name[:len(requirement)] == requirement]
 
 class Advisor:
     
     def getHint(self, cmd:CommandFactory, menu):
-        
-
-        def suitableList(wholeList:list[str], requirement:str) -> list[str]:
-            return [name for name in wholeList if name[:len(requirement)] == requirement]
-
-        menu.clear()
         menuList = []
         try:
             match cmd.inputStage():
@@ -35,7 +32,7 @@ class Advisor:
                 case 1:
                     # mode
                     commandinfo = cmd.nameWithMode
-                    menuList = suitableList([ commandinfo[0] + ':' + mode for mode in list(self.commands[commandinfo[0]].hints.keys()) if mode], cmd.last)
+                    menuList = suitableList([commandinfo[0] + ':' + mode for mode in list(self.commands[commandinfo[0]].hints.keys()) if mode], cmd.last)
 
                 case 2:
                     # arg
@@ -62,14 +59,12 @@ class Advisor:
     
     def inputCommand(self) -> Command:
         win = self.hog.wins["input"]
-        win.move(0, 0)
         cmd = CommandFactory()
         menu = self.hog.menu()
         self.getHint(cmd, menu)
         
         while cmd.isEmpty():
-            ch = win.getch()
-            while ch != 10:
+            for ch in self.hog.getchIterator():
                 match ch:
                     
                     case 9:
@@ -97,8 +92,38 @@ class Advisor:
                         win.addch(ch)
                         cmd.addChar(chr(ch))
                         self.getHint(cmd, menu)
-                
-                ch = win.getch()
 
-        win.erase()
         return cmd.produceCommand()
+
+
+
+def inputWithAdvice(hog, menu, hintFunc=lambda inp: ()) -> str:
+    win = hog.wins["input"]
+    inp = ''
+    menu.loadMenu(hintFunc(inp))
+    while not inp:
+        for ch in hog.getchIterator():
+            match ch:
+                case curses.KEY_DOWN:
+                    menu.down()
+                
+                case curses.KEY_UP:
+                    menu.up()
+                
+                case curses.KEY_RIGHT:
+                    hint = menu()
+                    if hint:
+                        inp = hint
+                        win.addstr(0, 0, inp)
+                
+                case curses.KEY_BACKSPACE:
+                    if inp:
+                        win.delch(0, len(inp)-1)
+                        inp = inp[:-1]
+                        menu.loadMenu(hintFunc(inp))
+                
+                case _:
+                    win.addch(ch)
+                    inp += chr(ch)
+                    menu.loadMenu(hintFunc(inp))
+    return inp

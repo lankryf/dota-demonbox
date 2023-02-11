@@ -38,7 +38,9 @@ class Escorenews(AsyncBoosted):
     # Getter functions
     @staticmethod
     def getPagesFromSheet(link:str, *_) -> list[str]:
-        return findallWithFunc(r'<a class="article v_gl582" href="(.*?)">', link)
+        pages = findallWithFunc(r'<a class="article v_gl582" href="(.*?)">', link)
+        pages.reverse()
+        return pages
 
     @staticmethod
     def getResultFromPage(page:str, link:str):

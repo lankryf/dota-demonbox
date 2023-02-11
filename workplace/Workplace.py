@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# metaclasses
+from tools.metaclasses import Singleton
+
 #for configs
 from configparser import ConfigParser
 from json import load as jsonLoad
@@ -33,14 +36,11 @@ from tools.DatafilesReaders.Web import Web
 
 from traceback import format_exc
 
-class Workplace(Advisor):
-    def __init__(self, configsPath:str="configs") -> None:
+class Workplace(Advisor, metaclass=Singleton):
+
+    def setup(self, configsPath:str="configs"):
         self.__configsPath = configsPath
-        self.__work = True
-        self.__setup()
-
-
-    def __setup(self):
+        self.__work = True # for loop
         # init termhog
         with open("tools/Termhog/Themes/8colors.json", "r") as f:
             self.hog = Termhog(jsonLoad(f))
@@ -65,12 +65,20 @@ class Workplace(Advisor):
         self.hog.ok("TermHog theme was set")
 
         # load database
-        self.bar = Databar(self.__config["database"]["path"], self.__config["database"]["backupsFolder"])
+
+        self.bar = Databar()
+        self.bar.setup(self.__config["database"]["path"], self.__config["database"]["backupsFolder"])
         self.hog.ok("Database has been opened.")
 
         # Data readers
         self.tasks = Tasks(self.__config["processing"]["taskFilePath"])
         self.web = Web(self.__config["web"]["webFilePath"])
+
+        # Demon
+        self.aimodel = None
+        
+        if self.config["demon"]["defaultModel"]:
+            self.aimodel = None #todo init Demon model
 
         self.__initCommands()
     

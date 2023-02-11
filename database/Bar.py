@@ -15,6 +15,9 @@
 
 import sqlite3
 
+# metaclass
+from tools.metaclasses import Singleton
+
 # for backups
 from tools.BackupsNerd import backupName
 
@@ -27,8 +30,8 @@ from database.models.Teams import *
 from database.models.Matches import *
 
 
-class Databar(Characters, Teams, Matches):
-    def __init__(self, path, backupsFolder="database/backups"):
+class Databar(Characters, Teams, Matches, metaclass=Singleton):
+    def setup(self, path, backupsFolder="database/backups"):
         self.__path = path
         self.__backupsFolder = backupsFolder + '/'
         

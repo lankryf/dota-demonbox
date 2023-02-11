@@ -80,6 +80,7 @@ class Menu:
         return result
         
     def loadMenu(self, menuList:list[str]) -> None:
+        self.clear()
         self.__menuList = menuList
         self.__now = 0
         self.__page = 0
@@ -196,6 +197,14 @@ class Termhog:
         win.addstr(text)
         win.refresh()
     
+    def getchIterator(self):
+        win = self.wins["input"]
+        win.move(0, 0)
+        ch = win.getch()
+        while ch != 10:
+            yield ch
+            ch = win.getch()
+        win.erase()
     
     def info(self, text:str) -> None:
         self.__printWithIcon("[i] ", text, 1)

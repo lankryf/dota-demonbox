@@ -34,12 +34,16 @@ class Matches:
         return result[0][0] if result else None
     
     
-    def matchIterate(self):
+    def matchIterate(self, start:int=0):
         """Yields matches from database
 
+        Args:
+            start (int, optional): Start from id (this id will be not included). Defaults to 0.
+
         Yields:
-            Match: Wow, it's a match
+            _type_: Wow, it's a match
         """
+
         self.cur.execute('''
             SELECT matches.link, matches.team1_id,
                 matches.team2_id, matches.match_id,
@@ -48,8 +52,8 @@ class Matches:
             
             FROM matches, games, drafts 
             
-            ON drafts.game_id = games.game_id
-                AND games.match_id = matches.match_id''')
+            ON matches.match_id > ? AND drafts.game_id = games.game_id
+                AND games.match_id = matches.match_id''', (start,))
 
         # first
         first = next(self.cur)
@@ -82,6 +86,9 @@ class Matches:
         self.cur.execute("SELECT COUNT(*) FROM matches")
         return self.cur.fetchall()[0][0]
     
+    def matchMaxId(self) -> int:
+        self.cur.execute("SELECT MAX(match_id) FROM matches")
+        return self.cur.fetchall()[0][0]
     
     def matchDelete(self, matchId:int) -> None:
         """Deletes match from database

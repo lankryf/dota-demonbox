@@ -125,7 +125,7 @@ class Game:
 
     
 class Match:
-    def __init__(self, games:list[Game], link:str, teams:list[str], id:int|None=None) -> None:
+    def __init__(self, games:list[Game], link:str, teams:list[str]|list[int], id:int|None=None) -> None:
         self.__games = games
         self.__link = link
         self.__teams = teams
@@ -136,6 +136,9 @@ class Match:
     
     def __len__(self):
         return len(self.__games)
+    
+    def __iter__(self):
+        return iter(self.__games)
     
     @classmethod
     def empty(cls, link:str, team1, team2, id:int|None=None):

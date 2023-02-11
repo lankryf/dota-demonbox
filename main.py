@@ -13,7 +13,12 @@
 # limitations under the License.
 
 from workplace.Workplace import Workplace
+from os import environ
+
+environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
-    workplace = Workplace("configs")
+    workplace = Workplace()
+
+    workplace.setup("configs")
     workplace.inputLoop()

@@ -25,9 +25,17 @@ class Getinfo(Father):
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-
+        
         if cmd.mode is None:
-            wp.hog.info("There is nothing to do :)")
+            wp.hog.info("We have:")
+            wp.hog.info(f"{wp.bar.characterCount()} characters,")
+            wp.hog.info(f"Character max ID is {wp.bar.characterMaxId()},")
+            wp.hog.space()
+            wp.hog.info(f"{wp.bar.teamCount()} teams,")
+            wp.hog.info(f"Team max ID is {wp.bar.teamMaxId()},")
+            wp.hog.space()
+            wp.hog.info(f"{wp.bar.matchCount()} matches,")
+            wp.hog.info(f"Match max ID is {wp.bar.matchMaxId()};")
             return
 
         funcs = {
