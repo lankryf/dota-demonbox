@@ -27,11 +27,17 @@ class Predict(Father):
     def body(wp:Workplace, cmd:Command):
         menu = wp.hog.menu()
         drafts = []
-        teams = []
+        teamsNames = []
+        teamsIds = []
         for teamIndex in range(2):
             name = inputWithAdvice(wp.hog, menu, lambda inp: wp.bar.searchFullNames(inp, "teams_names"))
             wp.hog.info(f"Team {teamIndex} is {name}")
-            teams.append(name)
+            teamId = wp.bar.teamIdByName(name)
+            if teamId is None:
+                wp.hog.fatal(f'Team\'s name "{name}" wasn\'t found!')
+                return
+            teamsIds.append(teamId)
+            teamsNames.append(name)
         drafts = []
         for draftIndex in range(2):
             wp.hog.space()
@@ -40,12 +46,17 @@ class Predict(Father):
                 name = inputWithAdvice(wp.hog, menu, lambda inp: wp.bar.searchFullNames(inp, "characters_names"))
                 wp.hog.info(f"Team {draftIndex} character {characterIndex} is {name}")
                 draft.append(name)
-            drafts.append(DraftStr(draft))
+            draft = DraftStr(draft)
+            nonExistmentDrafts = draft.checkNonExistent(wp.bar)
+            if nonExistmentDrafts:
+                wp.hog.fatal(f'Character\'s name "{nonExistmentDrafts[0]}" wasn\'t found!')
+                return
+            drafts.append(draft)
         wp.hog.space()
-        match = Match([Game(drafts, 0)], 0, [wp.bar.teamIdByName(name) for name in teams])
+        match = Match([Game(drafts, 0)], 0, teamsIds)
         predicted = predictMatch(match)[0][0]
         match.reverse()
         predicted = (predicted + predictMatch(match)[0][0])/2
         wp.hog.ok(str(predicted))
-        wp.hog.proportion(*teams, (1 - predicted)*100)
+        wp.hog.proportion(*teamsNames, (1 - predicted)*100)
         wp.hog.progressEnding()

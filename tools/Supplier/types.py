@@ -51,7 +51,9 @@ class DraftStr(Draft):
             list[int]: Draft's list as ids
         """
         return [databar.characterIdAnyways(name) for name in self._draftList]
-
+    
+    def checkNonExistent(self, databar) -> list[str]:
+        return [name for name in self._draftList if databar.characterIdByName(name) is None]
 
 class DraftId(Draft):
     def __init__(self, idsList:list[int]) -> None:
@@ -81,6 +83,8 @@ class DraftId(Draft):
         """
         return [databar.characterAllNames(characterId)[0] for characterId in self._draftList]
 
+    def checkNonExistent(self, databar) -> list[str]:
+        return [charId for charId in self._draftList if not databar.characterAllNames(charId)]
 
 class Game:
     def __init__(self, drafts:list[DraftId|DraftStr], result:int, id:int|None=None):
