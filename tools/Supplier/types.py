@@ -159,6 +159,11 @@ class Match:
         """
         self.__games.append(game)
     
+    def reverse(self) -> None:
+        self.__teams.reverse()
+        for game in self.__games:
+            game.reverse()
+
     @property
     def link(self) -> str:
         return self.__link

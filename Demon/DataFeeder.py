@@ -46,10 +46,10 @@ def packData(drafts:list, teams:list, result:int):
 def regularPacker(teams:list, drafts:list, game:Game):
     yield packData(teams, drafts, game.result)
 def trainPacker(teams:list, drafts:list, game:Game):
-    yield regularPacker(teams, drafts, game)
+    yield packData(teams, drafts, game.result)
     yield packData(list(reversed(teams)), list(reversed(drafts)), 1-game.result)
-def withGamePacker(teams:list, drafts:list, game:Game):
-    yield game, regularPacker(teams, drafts, game)
+def inputsWithGamePacker(teams:list, drafts:list, game:Game):
+    yield game, packInputs(teams, drafts)
 
 
 
@@ -57,6 +57,7 @@ def getData(matches, packer=trainPacker):
     wp = Workplace()
     characterMaxId = wp.bar.characterMaxId() + 1
     teamMaxId = wp.bar.teamMaxId() + 1
+    wp.hog.info(str((characterMaxId+teamMaxId)*2))
 
     for match in matches:
         teams = teamsCategorical(match, teamMaxId)

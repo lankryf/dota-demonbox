@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from workplace.Commands.Common.CommandFather import *
-from Demon.DataFeeder import withGamePacker, getData
+from Demon.DataFeeder import inputsWithGamePacker, getData
 
 class Check(Father):
 
@@ -26,7 +26,7 @@ class Check(Father):
             case "predicts":
                 ok = 0
                 gamesCount = 0
-                for game, packed in getData(wp.bar.matchIterate(-100), withGamePacker):
+                for game, packed in getData(wp.bar.matchIterate(-100), inputsWithGamePacker):
                     gamesCount += 1
                     predicted = round(wp.aimodel.predict(packed, verbose=0)[0][0])
                     real = game.result

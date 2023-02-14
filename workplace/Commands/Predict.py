@@ -42,7 +42,10 @@ class Predict(Father):
                 draft.append(name)
             drafts.append(DraftStr(draft))
         wp.hog.space()
-        predicted = predictMatch(Match([Game(drafts, None)], None, [wp.bar.teamIdByName(name) for name in teams]))[0][0]
+        match = Match([Game(drafts, 0)], 0, [wp.bar.teamIdByName(name) for name in teams])
+        predicted = predictMatch(match)[0][0]
+        match.reverse()
+        predicted = (predicted + predictMatch(match)[0][0])/2
         wp.hog.ok(str(predicted))
         wp.hog.proportion(*teams, (1 - predicted)*100)
         wp.hog.progressEnding()

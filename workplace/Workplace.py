@@ -79,8 +79,12 @@ class Workplace(Advisor, metaclass=Singleton):
         
         if self.config["demon"]["defaultModel"]:
             self.aimodel = None #todo init Demon model
-
+        else:
+            self.hog.warn("There is no aimodel as default. Switch it!")
+        
+        self.hog.info("initialization for some stuff...")
         self.__initCommands()
+        self.hog.done("I am ready for work!")
     
     
     @property

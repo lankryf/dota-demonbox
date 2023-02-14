@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from workplace.Commands.Common.CommandFather import *
+from Demon.DataFeeder import inputDataLen
 
 class Getinfo(Father):
 
@@ -38,6 +39,8 @@ class Getinfo(Father):
                 wp.hog.space()
                 wp.hog.info(f"{wp.bar.matchCount()} matches,")
                 wp.hog.info(f"Match max ID is {wp.bar.matchMaxId()};")
+                wp.hog.space()
+                wp.hog.info(f"Input shape is {inputDataLen()}")
             
             case 'match':
                 match = wp.bar.matchById(cmd.args[0])
