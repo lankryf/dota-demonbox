@@ -6,9 +6,11 @@
         "done": {"id": 4, "fg": 40 , "bg": -1},
         "fatal":{"id": 5, "fg": 124, "bg": -1},
         "user": {"id": 6, "fg": 105, "bg": -1},
-        "acid prune":{"id": 7, "fg": 84, "bg": 53},
+        "acid on dark prune":{"id": 7, "fg": 84, "bg": 53},
         "warn": {"id": 8, "fg": 214, "bg": -1},
-        "quest":{"id": 9, "fg": 48 , "bg": -1}
+        "quest":{"id": 9, "fg": 48 , "bg": -1},
+        "acid": {"id": 10, "fg": 84 , "bg": -1},
+        "prune": {"id": 11, "fg": 207 , "bg": -1}
     },
 
     "borders": true,

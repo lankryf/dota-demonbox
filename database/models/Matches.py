@@ -38,11 +38,14 @@ class Matches:
         """Yields matches from database
 
         Args:
-            start (int, optional): Start from id (this id will be not included). Defaults to 0.
+            start (int, optional): Start from id (this id will be not included). Negative if start is relative to end. Defaults to 0.
 
         Yields:
-            _type_: Wow, it's a match
+            Match: Wow, it's a match
         """
+
+        if start < 0: # negative start number
+            start = self.matchMaxId() + start
 
         self.cur.execute('''
             SELECT matches.link, matches.team1_id,
@@ -55,6 +58,27 @@ class Matches:
             ON matches.match_id > ? AND drafts.game_id = games.game_id
                 AND games.match_id = matches.match_id''', (start,))
 
+        for match in self.__matchesFromCur():
+            yield match
+
+    def matchById(self, _id:int) -> Match:
+        self.cur.execute('''
+            SELECT matches.link, matches.team1_id,
+                matches.team2_id, matches.match_id,
+                games.result, games.game_id,
+                drafts.team, drafts.character_id
+            
+            FROM matches, games, drafts 
+            
+            ON matches.match_id == ? AND drafts.game_id = games.game_id
+                AND games.match_id = matches.match_id''', (_id,))
+
+        try:
+            return next(self.__matchesFromCur())
+        except: return None
+        
+    
+    def __matchesFromCur(self):
         # first
         first = next(self.cur)
         match = Match.empty(*first[:4])

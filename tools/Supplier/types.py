@@ -73,6 +73,13 @@ class DraftId(Draft):
         """
         return self._draftList
 
+    def stringsList(self, databar) -> list[str]:
+        """Draft's list as strings
+
+        Returns:
+            list[str]: Draft's list as strings
+        """
+        return [databar.characterAllNames(characterId)[0] for characterId in self._draftList]
 
 
 class Game:

@@ -241,6 +241,19 @@ class Termhog:
         win.erase()
         win.refresh()
     
+    def proportion(self, name1:str, name2:str, name1Percent:float|int) -> None:
+        win = self.wins['process']
+        win.erase()
+        name1Percent = round(name1Percent, 3)
+        width  = win.getmaxyx()[1]
+        win.addstr(0, 0, f'{name1Percent}%', curses.color_pair(11))
+        win.addstr(0, width-7, f"{round(100-name1Percent, 3)}%", curses.color_pair(10))
+        name1BarWidth = int(width*name1Percent/100)
+        win.addstr(1, 0, f"{'█'*width}", curses.color_pair(10))
+        win.addstr(1, 0, f"{'█'*name1BarWidth}", curses.color_pair(11))
+        win.addstr(2, 0, name1, curses.color_pair(11))
+        win.addstr(2, width - len(name2)-1, name2, curses.color_pair(10))
+        win.refresh()
     
     def displayLogo(self) -> None:
         win = self.wins["process"]

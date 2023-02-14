@@ -15,8 +15,7 @@ from tools.Supplier.types import Match
 from workplace.Workplace import Workplace
 from Demon.DataFeeder import draftsCategorical, teamsCategorical, packInputs
 
-def predict(match:Match) -> float:
+def predictMatch(match:Match) -> float:
     wp = Workplace()
     inps = packInputs(draftsCategorical(match[0], wp.bar.characterMaxId()+1), teamsCategorical(match, wp.bar.teamMaxId()+1))
-    return wp.aimodel.predict(inps)
-
+    return wp.aimodel.predict(inps, verbose=0)

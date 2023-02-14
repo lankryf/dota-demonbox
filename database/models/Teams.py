@@ -113,3 +113,4 @@ class Teams:
     def teamAllNames(self, teamId:int) -> list[str]:
         self.cur.execute("SELECT name from teams_names WHERE team_id == ?", (teamId,))
         return [row[0] for row in self.cur.fetchall()]
+    

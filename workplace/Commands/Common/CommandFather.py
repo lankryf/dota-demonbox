@@ -29,10 +29,15 @@ class Father:
         if command.mode not in cls.hints:
             workplace.hog.fatal(f'Command "{command.name}" has no mode named "{command.mode}"')
             return
-        
-        if len(command.args) != len(cls.hints[command.mode]):
-            workplace.hog.fatal(f'Command "{command.name}" must have {len(cls.hints[command.mode])} args. ({len(command.args)} given)"')
+        thisHints = cls.hints[command.mode]
+        if len(command.args) != len(thisHints):
+            workplace.hog.fatal(f'Command "{command.name}" must have {len(thisHints)} args. ({len(command.args)} given)"')
             return
-
+        
+        for n, hint in enumerate(thisHints):
+            if type(hint) is type:
+                if not command.argToType(n, hint):
+                    workplace.hog.fatal(f"Argument number {n} must fit to type {hint}")
+                    return
         
         cls.body(workplace, command)

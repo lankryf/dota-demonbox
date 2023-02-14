@@ -22,6 +22,14 @@ class Command:
     def __len__(self):
         return len(self.__args)
     
+    def argToType(self, argNumber:int, __type:type):
+        try:
+            arg = __type(self.__args[argNumber])
+        except: return False
+        else:
+            self.__args[argNumber] = arg
+            return True
+
     @property
     def name(self) -> str:
         return self.__name

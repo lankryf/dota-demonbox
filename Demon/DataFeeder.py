@@ -41,7 +41,19 @@ def packData(drafts:list, teams:list, result:int):
     return packInputs(drafts, teams), tf.constant(result, dtype="float32", shape=(1,1))
 
 
-def getInputData(matches):
+
+# packers
+def regularPacker(teams:list, drafts:list, game:Game):
+    yield packData(teams, drafts, game.result)
+def trainPacker(teams:list, drafts:list, game:Game):
+    yield regularPacker(teams, drafts, game)
+    yield packData(list(reversed(teams)), list(reversed(drafts)), 1-game.result)
+def withGamePacker(teams:list, drafts:list, game:Game):
+    yield game, regularPacker(teams, drafts, game)
+
+
+
+def getData(matches, packer=trainPacker):
     wp = Workplace()
     characterMaxId = wp.bar.characterMaxId() + 1
     teamMaxId = wp.bar.teamMaxId() + 1
@@ -50,5 +62,5 @@ def getInputData(matches):
         teams = teamsCategorical(match, teamMaxId)
         for game in match:
             drafts = draftsCategorical(game, characterMaxId)
-            yield packData(teams, drafts, game.result)
-            yield packData(list(reversed(teams)), list(reversed(drafts)), 1-game.result)
+            for packedData in packer(teams, drafts, game):
+                yield packedData 

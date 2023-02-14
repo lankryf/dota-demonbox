@@ -15,8 +15,7 @@
 from workplace.Commands.Common.CommandFather import *
 from tools.Supplier.types import Match, Game, DraftStr
 from workplace.Advisor import inputWithAdvice
-import curses
-from Demon.Demon import predict
+from Demon.Demon import predictMatch
 
 
 class Predict(Father):
@@ -42,5 +41,8 @@ class Predict(Father):
                 wp.hog.info(f"Team {draftIndex} character {characterIndex} is {name}")
                 draft.append(name)
             drafts.append(DraftStr(draft))
-        
-        wp.hog.ok(str(predict(Match([Game(drafts, None)], None, [wp.bar.teamIdByName(name) for name in teams]))[0][0]))
+        wp.hog.space()
+        predicted = predictMatch(Match([Game(drafts, None)], None, [wp.bar.teamIdByName(name) for name in teams]))[0][0]
+        wp.hog.ok(str(predicted))
+        wp.hog.proportion(*teams, (1 - predicted)*100)
+        wp.hog.progressEnding()
