@@ -17,12 +17,18 @@ from tools.Supplier.types import Match, Game
 from keras.utils import to_categorical
 import tensorflow as tf
 
-def inputDataLen():
+
+def inputDataLen() -> int:
+    """Input shape lenght
+
+    Returns:
+        int: lenght
+    """
     wp = Workplace()
     return (wp.bar.characterMaxId() + wp.bar.teamMaxId() + 2) * 2
 
 
-def teamsCategorical(match:Match, teamMaxId:int):
+def teamsCategorical(match:Match, teamMaxId:int) -> list:
     return [to_categorical(
         match.teams[teamNumber], teamMaxId
         ) for teamNumber in range(0, 2)] 
@@ -38,18 +44,64 @@ def packInputs(drafts:list, teams:list):
 
 
 def packData(drafts:list, teams:list, result:int):
+    """Pacs inputs and output
+
+    Args:
+        drafts (list): draftsCategorical output
+        teams (list): teamsCategorical output
+        result (int): game's result
+
+    Returns:
+        tf.constant: packed inputs
+        tf.constant: packed output
+    """
     return packInputs(drafts, teams), tf.constant(result, dtype="float32", shape=(1,1))
 
 
 
 # packers
-def regularPacker(teams:list, drafts:list, game:Game):
-    yield packData(teams, drafts, game.result)
-def trainPacker(teams:list, drafts:list, game:Game):
-    yield packData(teams, drafts, game.result)
-    yield packData(list(reversed(teams)), list(reversed(drafts)), 1-game.result)
-def inputsWithGamePacker(teams:list, drafts:list, game:Game):
-    yield game, packInputs(teams, drafts)
+def regularPacker(drafts:list, teams:list, game:Game):
+    """Packs inputs and outputs and yields them
+
+    Args:
+        drafts (list): draftsCategorical output
+        teams (list): teamsCategorical output
+        game (Game): current game
+
+    Yields:
+        tf.constant: packed inputs
+        tf.constant: packed output
+    """
+    yield packData(drafts, teams, game.result)
+
+def trainPacker(drafts:list, teams:list, game:Game):
+    """Packs inputs and outputs and yields them and reversed versions
+
+    Args:
+        drafts (list): draftsCategorical output
+        teams (list): teamsCategorical output
+        game (Game): current game
+
+    Yields:
+        tf.constant: packed inputs
+        tf.constant: packed output
+    """
+    yield packData(drafts, teams, game.result)
+    yield packData(list(reversed(drafts)), list(reversed(teams)), 1-game.result)
+
+def inputsWithGamePacker(drafts:list, teams:list, game:Game):
+    """Packs only inputs and current game
+
+    Args:
+        drafts (list): draftsCategorical output
+        teams (list): teamsCategorical output
+        game (Game): current game
+
+    Yields:
+        Game: current game
+        tf.constant: packed inputs
+    """
+    yield game, packInputs(drafts, teams)
 
 
 
@@ -63,5 +115,5 @@ def getData(matches, packer=trainPacker):
         teams = teamsCategorical(match, teamMaxId)
         for game in match:
             drafts = draftsCategorical(game, characterMaxId)
-            for packedData in packer(teams, drafts, game):
+            for packedData in packer(drafts, teams, game):
                 yield packedData 

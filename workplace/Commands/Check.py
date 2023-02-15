@@ -14,6 +14,7 @@
 
 from workplace.Commands.Common.CommandFather import *
 from Demon.DataFeeder import inputsWithGamePacker, getData
+from database.generators.matchesGenerator import matchesFlow
 
 class Check(Father):
 
@@ -26,7 +27,7 @@ class Check(Father):
             case "predicts":
                 ok = 0
                 gamesCount = 0
-                for game, packed in getData(wp.bar.matchIterate(-100), inputsWithGamePacker):
+                for game, packed in getData(matchesFlow(-100), inputsWithGamePacker):
                     gamesCount += 1
                     predicted = round(wp.aimodel.predict(packed, verbose=0)[0][0])
                     real = game.result

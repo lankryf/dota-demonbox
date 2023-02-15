@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from workplace.Commands.Common.CommandFather import *
-
+from database.generators.matchesGenerator import matchesFlow
 
 class Inspect(Father):
 
@@ -26,7 +26,7 @@ class Inspect(Father):
         errors = []
         matchCount = wp.bar.matchCount()
         
-        for match in wp.hog.progressbar(wp.bar.matchIterate(), matchCount, "INSPECTION"):
+        for match in wp.hog.progressbar(matchesFlow(), matchCount, "INSPECTION"):
             if len(match) == 0:
                 wp.hog.err(f"Empty match {match.id}")
                 errors.append(match.id)

@@ -14,6 +14,8 @@
 
 from workplace.Commands.Common.CommandFather import *
 from Demon.DataFeeder import inputDataLen
+from database.generators.matchesGenerator import matchById
+
 
 class Getinfo(Father):
 
@@ -43,7 +45,7 @@ class Getinfo(Father):
                 wp.hog.info(f"Input shape is {inputDataLen()}")
             
             case 'match':
-                match = wp.bar.matchById(cmd.args[0])
+                match = matchById(cmd.args[0])
                 if match is None:
                     wp.hog.err(f'Match with id "{cmd.args[0]}" wasn\'t found!')
                     return

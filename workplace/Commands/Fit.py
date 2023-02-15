@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from workplace.Commands.Common.CommandFather import *
-
+from database.generators.matchesGenerator import matchesFlow
 
 import tensorflow as tf
 from Demon.DataFeeder import getData
@@ -32,7 +32,7 @@ class Fit(Father):
         wp.hog.ok("Compiled.")
 
         train_x, train_y = [], []
-        for x, y in getData(wp.bar.matchIterate(-1000)):
+        for x, y in getData(matchesFlow(-1000)):
             train_x.append(x)
             train_y.append(y)
         train_x = tf.concat(train_x, 0)
