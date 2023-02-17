@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Commands.Common.CommandFather import *
+from .Common.CommandFather import *
 
 from tools.BackupsNerd import BackupsNerd
 from sqlite3 import connect
+from tools.Termhog.types import Progressbar
 
 class Source(Father):
 
@@ -46,7 +47,7 @@ class Source(Father):
         with connect(donorfile) as donor:
             donorcur = donor.cursor()
             
-            for table in wp.hog.progressbar(tables, len(tables), "SOURCING"):
+            for table in Progressbar(tables, len(tables), "SOURCING"):
                 donorcur.execute(f"SELECT * from {table}")
                 for donorrow in donorcur:
                     wp.bar.cur.execute(

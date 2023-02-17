@@ -14,7 +14,7 @@
 
 
 import asyncio, aiohttp
-from tools.Supplier.Proxima import Proxima
+from .Proxima import Proxima
 
 class AsyncBoosted:
     def __init__(self, waitingTime:float|int=2, proxima:Proxima=Proxima()):

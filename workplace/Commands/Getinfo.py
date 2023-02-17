@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Commands.Common.CommandFather import *
+from .Common.CommandFather import *
 from Demon.DataFeeder import inputDataLen
 from database.generators.matchesGenerator import matchById
 
@@ -57,7 +57,7 @@ class Getinfo(Father):
                     wp.hog.space()
                     wp.hog.info(f"Game {gameNumber}:")
                     for draftNumber, draft in enumerate(game.drafts):
-                        wp.hog.info(f"Draft{draftNumber}: {' '.join(draft.stringsList(wp.bar))}")
+                        wp.hog.info(f"Draft{draftNumber}: {' '.join(draft.stringsList())}")
                     wp.hog.info(f"Result: {game.result}")
                 
                 wp.hog.space()

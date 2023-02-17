@@ -15,11 +15,11 @@
 
 from requests import get
 
-from tools.Supplier.AsyncBoosted import AsyncBoosted
-from tools.Supplier.types import Match, Game, DraftStr
+from ..AsyncBoosted import AsyncBoosted
+from ..types import Match, Game, DraftStr
 
 from tools.stringwiz import findallWithFunc
-from tools.Supplier.supptools import normalizeName, hasOneSimilar
+from ..supptools import normalizeName, hasOneSimilar
 
 
 

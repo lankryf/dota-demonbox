@@ -22,15 +22,12 @@ from tools.metaclasses import Singleton
 from tools.BackupsNerd import backupName
 
 # migrations
-from database.migrations import migrations
+from .migrations import migrations
 
 # models
-from database.models.Characters import *
-from database.models.Teams import *
-from database.models.Matches import *
+from . import models
 
-
-class Databar(Characters, Teams, Matches, metaclass=Singleton):
+class Databar(models.Characters, models.Teams, models.Matches, metaclass=Singleton):
     def setup(self, path, backupsFolder="database/backups"):
         self.__path = path
         self.__backupsFolder = backupsFolder + '/'

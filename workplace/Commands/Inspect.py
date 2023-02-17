@@ -12,52 +12,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Commands.Common.CommandFather import *
+from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
+from Demon.DataFeeder import inputsWithGamePacker, getData
+from tools.Termhog.types import Progressbar
 
 class Inspect(Father):
 
     flags = ('b', 'f')
-    hints = {None: ()}
+    hints = {None: (), "matches": (), "predictions": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-        wp.hog.info("Starting inspection.")
-        errors = []
-        matchCount = wp.bar.matchCount()
-        
-        for match in wp.hog.progressbar(matchesFlow(), matchCount, "INSPECTION"):
-            if len(match) == 0:
-                wp.hog.err(f"Empty match {match.id}")
-                errors.append(match.id)
-                continue
-            
-            for game in match:
-                if len(game.drafts) != 2:
-                    wp.hog.err(f"Game {game.id} has {len(game.drafts)} drafts (must be 2)")
-                    errors.append(match.id)
-                    continue
+        match cmd.mode:
+            case "matches":
+                wp.hog.info("Starting inspection for matches.")
+                errors = []
+                matchCount = wp.bar.matchCount()
                 
-                for n, draft in enumerate(game.drafts):
-                    if len(draft) != 5:
-                        wp.hog.err(f"Draft {n} from game {game.id} has {len(game.drafts)} characters (must be 5)")
+                for match in Progressbar(matchesFlow(), matchCount, "INSPECTION"):
+                    if len(match) == 0:
+                        wp.hog.err(f"Empty match {match.id}")
                         errors.append(match.id)
                         continue
+                    
+                    for game in match:
+                        if len(game.drafts) != 2:
+                            wp.hog.err(f"Game {game.id} has {len(game.drafts)} drafts (must be 2)")
+                            errors.append(match.id)
+                            continue
+                        
+                        for n, draft in enumerate(game.drafts):
+                            if len(draft) != 5:
+                                wp.hog.err(f"Draft {n} from game {game.id} has {len(game.drafts)} characters (must be 5)")
+                                errors.append(match.id)
+                                continue
 
-        wp.hog.info(f"{matchCount - len(errors)}/{matchCount} matches is ok.")
-        wp.hog.info(f"We have {len(errors)} errors.")
-        
-        if 'b' in cmd.flags:
-            wp.bar.backup()
-            wp.hog.ok("Backuped.")
-        
-        if 'f' in cmd.flags:
-            wp.hog.info("Fixing.")
-            errors = set(errors)
-            for matchId in errors:
-                wp.bar.matchDelete(matchId)
-                wp.hog.ok(f"Match {matchId} has been deleted.")
-            wp.bar.commit()
-            wp.hog.ok("Commited.")
-        wp.hog.done("Inspection has been done.")
-        wp.hog.progressEnding()
+                wp.hog.info(f"{matchCount - len(errors)}/{matchCount} matches is ok.")
+                wp.hog.info(f"We have {len(errors)} errors.")
+                
+                if 'b' in cmd.flags:
+                    wp.bar.backup()
+                    wp.hog.ok("Backuped.")
+                
+                if 'f' in cmd.flags:
+                    wp.hog.info("Fixing.")
+                    errors = set(errors)
+                    for matchId in errors:
+                        wp.bar.matchDelete(matchId)
+                        wp.hog.ok(f"Match {matchId} has been deleted.")
+                    wp.bar.commit()
+                    wp.hog.ok("Commited.")
+                wp.hog.done("Inspection has been done.")
+                wp.hog.progressEnding()
+
+
+            case "predictions":
+                wp.hog.info("Starting inspection for predictions.")
+                ok = 0
+                gamesCount = 0
+                for game, packed in getData(matchesFlow(-100), inputsWithGamePacker):
+                    gamesCount += 1
+                    predicted = round(wp.aimodel.predict(packed, verbose=0)[0][0])
+                    real = game.result
+                    if predicted != real:
+                        wp.hog.err(f"Wrong, predict/real: {predicted}/{real}")
+                        continue
+                    wp.hog.ok(f"Game {gamesCount} has been predicted.")
+                    ok += 1
+                    
+                wp.hog.info(f"We have {ok}/{gamesCount} games, that have been predicted correctly.")
+            
+                
+            case _:
+                wp.hog.info("There is nothing to do :)")
+            

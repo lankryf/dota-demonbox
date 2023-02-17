@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Command import Command, CommandFactory
+from .Command import Command, CommandFactory
+from tools.Termhog.types import Menu
 import curses
 
 # TODO: make inputCommand depend on the inputWithAdvice
@@ -60,7 +61,7 @@ class Advisor:
     def inputCommand(self) -> Command:
         win = self.hog.wins["input"]
         cmd = CommandFactory()
-        menu = self.hog.menu()
+        menu = Menu()
         self.getHint(cmd, menu)
         
         while cmd.isEmpty():

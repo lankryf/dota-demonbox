@@ -12,149 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import curses
+from tools.metaclasses import Singleton
 
-class Progressbar:
-        def __init__(self, win:curses.window, iterable, iterLen:int, processName:str, start:int=None, step:int=1, borders=True):
-            self.__win = win
-            self.__width  = win.getmaxyx()[1]-2
-            self.__name = processName
-            self.__iterable = iterable
-            self.__barNow = 1
-            self.__iterLen = iterLen // step
-            self.__progressbarStep = self.__iterLen / self.__width
-            self.__start = 1
-
-            self.__draw(borders)
-
-            if start is not None:
-                self.__start = start // step
-                self.__makeStep(self.__start)
-            
-        
-        def __draw(self, borders=True):
-            self.__win.erase()
-            if borders:
-                self.__win.border()
-            self.__win.addstr(0, 1, self.__name)
-            self.__win.addstr(2, 1, f"0{' ' * (len(str(self.__iterLen))-1)}/{self.__iterLen}")
-            self.__drawBar(".", 2)
-
-        def __drawBar(self, symb:str, colorPair:int):
-            self.__win.addstr(1, 0, f"[{symb*self.__width}]", curses.color_pair(colorPair))
-            self.__win.refresh()
-        
-        def __moveBar(self, newBarPosition:int):
-            if newBarPosition <= self.__width:
-                self.__win.addstr(1, self.__barNow, "#"*(newBarPosition - self.__barNow), curses.color_pair(2))
-                self.__barNow = newBarPosition
-
-        def __done(self):
-            self.__win.addstr(2, 1, str(self.__iterLen))
-            self.__win.addstr(2, self.__width-3, "DONE", curses.color_pair(4))
-            self.__drawBar("#", 2)
-
-        def __makeStep(self, n:int):
-            newBarPosition = int(n // self.__progressbarStep)
-            if newBarPosition > self.__barNow:
-                self.__moveBar(newBarPosition)
-            self.__win.addstr(2, 1, str(n))
-            self.__win.refresh()
-        
-        def __iter__(self):
-            for n, i in enumerate(self.__iterable, self.__start):
-                yield i
-                self.__makeStep(n)
-            
-            self.__done()
-
-
-class Menu:
-    def __init__(self, win:curses.window):
-        self.__win = win
-        self.__rows, _ = self.__win.getmaxyx()
-        self.__active = False
-        
-    def __call__(self) -> str:
-        result = self.value
-        self.clear()
-        return result
-        
-    def loadMenu(self, menuList:list[str]) -> None:
-        self.clear()
-        self.__menuList = menuList
-        self.__now = 0
-        self.__page = 0
-        self.__active = True
-        self.__draw()
-        
-    def clear(self):
-        self.__active = False
-        self.__menuList = []
-        self.__maxRow = 0
-        self.__win.erase()
-        self.__win.refresh()
-    
-    def __draw(self):
-        menuPage = self.__now // self.__rows
-        if menuPage != self.__page:
-            self.__page = menuPage
-            self.__win.erase()
-        nowFirstOnPage = menuPage*self.__rows
-        now = self.__now % self.__rows
-        names = self.__menuList[nowFirstOnPage:nowFirstOnPage+self.__rows]
-        self.__maxRow = len(names) - 1 
-        for number, name in enumerate(names):
-            if number == now:
-                self.__win.addstr(number, 0, name, curses.color_pair(7))
-                continue
-            try:
-                self.__win.addstr(number, 0, name)
-            except:
-                print(f"---{name}")
-        self.__win.refresh()
-    
-    def down(self):
-        if self.__now < self.__maxRow:
-            self.__now += 1
-            self.__draw()
-        
-    def up(self):
-        if self.__now:
-            self.__now -= 1
-            self.__draw()
-        
-    @property
-    def value(self) -> str:
-        if self.__menuList:
-            return self.__menuList[self.__now]
-    
-    @property
-    def active(self) -> bool:
-        return self.__active
-    
-    @property
-    def height(self):
-        return self.__rows
-    
-    
-    
-class Termhog:
-    def __init__(self, termhogConfig:dict) -> None:
+class Termhog(metaclass=Singleton):
+    def setup(self, termhogTheme:dict) -> None:
         screen = curses.initscr()
         self.rows, self.cols = screen.getmaxyx()
         self.history = []
         curses.noecho()
         curses.start_color()
         curses.use_default_colors()
-        self.adjust(termhogConfig)
+        self.setTheme(termhogTheme)
         self.__initWins()
 
     
-    def adjust(self, termhogConfig:dict) -> None:
-        self.__logo = termhogConfig["logo"]
-        self.__initColors(termhogConfig["colors"])
-        self.__borders = termhogConfig["borders"]
+    def setTheme(self, termhogTheme:dict) -> None:
+        self.__logo = termhogTheme["logo"]
+        self.__initColors(termhogTheme["colors"])
+        self.__borders = termhogTheme["borders"]
 
+    @property
+    def borders(self):
+        return self.__borders
     
     def __initColors(self, colors:dict[dict]) -> None:
         for name in colors:
@@ -293,13 +172,6 @@ class Termhog:
         if self.wins["main"].getch() == 24:
             return True
         return False
-
-
-    def progressbar(self, iterable, iterLen:int, processName:str="PROCESS", start:int=None, step:int=1) -> Progressbar:
-        return Progressbar(self.wins["process"], iterable, iterLen, processName, start, step, self.__borders)
-
-    def menu(self) -> Menu:
-        return Menu(self.wins["gen"])
 
     def progressEnding(self):
         self.pressEnterTo("continue")

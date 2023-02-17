@@ -11,13 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from tools.Supplier.types import Match
-from workplace.Workplace import Workplace
-from .DataFeeder import draftsCategorical, teamsCategorical, packInputs
 
-__all__ = ["predictMatch"]
 
-def predictMatch(match:Match) -> float:
-    wp = Workplace()
-    inps = packInputs(draftsCategorical(match[0], wp.bar.characterMaxId()+1), teamsCategorical(match, wp.bar.teamMaxId()+1))
-    return wp.aimodel.predict(inps, verbose=0)
+from .Menu import Menu
+from .Progressbar import Progressbar

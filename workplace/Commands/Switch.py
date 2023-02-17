@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Commands.Common.CommandFather import *
+from .Common.CommandFather import *
 from os import path
 from keras.models import load_model
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.DatafilesReaders.Reader import Reader
+from .Reader import Reader
 
 
 class Web(Reader):

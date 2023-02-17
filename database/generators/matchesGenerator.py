@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from tools.Supplier.types import Match, Game
-from database.Bar import Databar
+from ..Bar import Databar
 
 
 def matchesFlow(start:int=0):

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Workplace import Workplace
+from workplace import Workplace
 from os import environ
 
 environ['TF_CPP_MIN_LOG_LEVEL'] = '2'

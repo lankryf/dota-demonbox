@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Workplace import Workplace
+from database import Databar
 from tools.Supplier.types import Match, Game
 from keras.utils import to_categorical
 import tensorflow as tf
@@ -24,8 +24,8 @@ def inputDataLen() -> int:
     Returns:
         int: lenght
     """
-    wp = Workplace()
-    return (wp.bar.characterMaxId() + wp.bar.teamMaxId() + 2) * 2
+    bar = Databar()
+    return (bar.characterMaxId() + bar.teamMaxId() + 2) * 2
 
 
 def teamsCategorical(match:Match, teamMaxId:int) -> list:
@@ -35,7 +35,7 @@ def teamsCategorical(match:Match, teamMaxId:int) -> list:
 
 def draftsCategorical(game:Game, characterMaxId:int):
     return [tf.math.reduce_sum(
-            to_categorical(game.drafts[draftNumber].idsList(Workplace().bar), characterMaxId), 0
+            to_categorical(game.drafts[draftNumber].idsList(), characterMaxId), 0
             ) for draftNumber in range(0, 2)]
 
 
@@ -106,10 +106,9 @@ def inputsWithGamePacker(drafts:list, teams:list, game:Game):
 
 
 def getData(matches, packer=trainPacker):
-    wp = Workplace()
-    characterMaxId = wp.bar.characterMaxId() + 1
-    teamMaxId = wp.bar.teamMaxId() + 1
-    wp.hog.info(str((characterMaxId+teamMaxId)*2))
+    bar = Databar()
+    characterMaxId = bar.characterMaxId() + 1
+    teamMaxId = bar.teamMaxId() + 1
 
     for match in matches:
         teams = teamsCategorical(match, teamMaxId)

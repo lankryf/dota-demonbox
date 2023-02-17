@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from workplace.Commands.Common.CommandFather import *
+from .Common.CommandFather import *
 
-from tools.Supplier.getters.Escorenews import Escorenews
-from tools.Supplier.Proxima import Proxima
+from tools.Supplier.getters import Escorenews
+from tools.Supplier import Proxima
+from tools.Termhog.types import Progressbar
 
 class Greatload(Father):
 
@@ -55,7 +56,7 @@ class Greatload(Father):
 
         clasterNumbers = None
         wp.hog.info(f"Starting ...")
-        for clasterStart in wp.hog.progressbar(range(starting, 0, -clasterSize), lastPage, "GREATLOAD", lastPage - starting, step=5):
+        for clasterStart in Progressbar(range(starting, 0, -clasterSize), lastPage, "GREATLOAD", lastPage - starting, step=5):
             
             if wp.hog.wantToStopProcess():
                 break

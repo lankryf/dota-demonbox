@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tools.Supplier.types import Match, Game
+
 from sqlite3 import IntegrityError
 
 class Matches:
@@ -56,7 +56,7 @@ class Matches:
         self.cur.execute("DELETE FROM matches WHERE match_id = ?", (matchId,))
 
 
-    def matchAdd(self, match:Match) -> bool:
+    def matchAdd(self, match) -> bool:
         """Adds match to database
 
         Args:
@@ -85,7 +85,7 @@ class Matches:
             )
             gameId = self.cur.fetchall()[0][0]
             for teamNumber, draft in enumerate(game.drafts):
-                for characterId in draft.idsList(self):
+                for characterId in draft.idsList():
                     self.cur.execute(
                         "INSERT INTO drafts(game_id, team, character_id) VALUES(?,?,?)",
                         (gameId, teamNumber, characterId)

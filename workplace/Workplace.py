@@ -22,17 +22,16 @@ from json import load as jsonLoad
 #for commands
 from os import listdir, path as ospath
 from importlib import import_module
-from workplace.Advisor import Advisor
+from .Advisor import Advisor
 
 # terminal interface
-from tools.Termhog.termhog import Termhog
+from tools.Termhog import Termhog
 
 # database
-from database.Bar import Databar
+from database import Databar
 
 # datareaders
-from tools.DatafilesReaders.Tasks import Tasks
-from tools.DatafilesReaders.Web import Web
+from tools.DatafilesReaders import Web, Tasks
 
 from traceback import format_exc
 
@@ -42,8 +41,9 @@ class Workplace(Advisor, metaclass=Singleton):
         self.__configsPath = configsPath
         self.__work = True # for loop
         # init termhog
-        with open("tools/Termhog/Themes/8colors.json", "r") as f:
-            self.hog = Termhog(jsonLoad(f))
+        self.hog = Termhog()
+        with open("configs/TermhogThemes/8colors.json", "r") as f:
+            self.hog.setup(jsonLoad(f))
         self.hog.ok("TermHog has been started.")
         
         self.hog.displayLogo()
@@ -59,7 +59,7 @@ class Workplace(Advisor, metaclass=Singleton):
 
         # refresh termhog theame
         with open(self.__config["termhog"]["themeFilePath"], "r") as f:
-            self.hog.adjust(jsonLoad(f))
+            self.hog.setTheme(jsonLoad(f))
 
         self.hog.ok("Config has been read.")
         self.hog.ok("TermHog theme was set")
