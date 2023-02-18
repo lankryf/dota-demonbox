@@ -6,7 +6,7 @@ backupsFolder = database/backups
 folder = workplace/Commands
 
 [termhog]
-themeFilePath = tools/Termhog/Themes/8colors.json
+themeFilePath = configs/TermhogThemes/8colors.json
 
 [getter]
 clasterSize = 5
@@ -16,3 +16,6 @@ webFilePath = configs/web.json
 
 [processing]
 taskFilePath = configs/tasks.json
+
+[demon]
+modelsFolder = Demon/Models

@@ -27,20 +27,20 @@ class Make(Father):
     def body(wp:Workplace, cmd:Command):
         match cmd.mode:
             case 'aimodel':
-                wp.aimodel = keras.Sequential([
+                aimodel = keras.Sequential([
                     Dense(1800, activation='relu', input_shape=(inputDataLen(),)),
                     Dense(580, activation='sigmoid'),
                     Dense(128, activation='sigmoid'),
                     Dense(1, activation='sigmoid')
                 ])
 
-                wp.aimodel.compile(
+                aimodel.compile(
                     optimizer="adam", loss="mean_squared_error",
                     metrics=['accuracy']
                 )
 
-                wp.aimodel.save(f"Demon/Models/{cmd.args[0]}")
-                wp.hog.info(f"Model {cmd.args[0]} has been created.")
+                aimodel.save(f"Demon/Models/{cmd.args[0]}")
+                wp.hog.ok(f"Model {cmd.args[0]} has been created.")
 
             case _:
                 wp.hog.info("There is nothing to do :)")

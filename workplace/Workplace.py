@@ -15,11 +15,11 @@
 # metaclasses
 from tools.metaclasses import Singleton
 
-#for configs
+# for configs
 from configparser import ConfigParser
 from json import load as jsonLoad
 
-#for commands
+# for commands
 from os import listdir, path as ospath
 from importlib import import_module
 from .Advisor import Advisor
@@ -33,6 +33,10 @@ from database import Databar
 # datareaders
 from tools.DatafilesReaders import Web, Tasks
 
+# Demon
+from Demon import Demon
+
+# for errors
 from traceback import format_exc
 
 class Workplace(Advisor, metaclass=Singleton):
@@ -74,15 +78,12 @@ class Workplace(Advisor, metaclass=Singleton):
         self.tasks = Tasks(self.__config["processing"]["taskFilePath"])
         self.web = Web(self.__config["web"]["webFilePath"])
 
+        self.hog.info("initialization for some demon's stuff...")
+
         # Demon
-        self.aimodel = None
-        
-        if self.config["demon"]["defaultModel"]:
-            self.aimodel = None #todo init Demon model
-        else:
-            self.hog.warn("There is no aimodel as default. Switch it!")
-        
-        self.hog.info("initialization for some stuff...")
+        self.demon = Demon()
+        self.demon.setup(self.__config["demon"]["modelsFolder"])
+
         self.__initCommands()
         self.hog.done("I am ready for work!")
     

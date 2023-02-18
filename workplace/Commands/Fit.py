@@ -15,33 +15,16 @@
 from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
 
-import tensorflow as tf
-from Demon.DataFeeder import getData
-
 class Fit(Father):
 
     flags = ()
-    hints = {None: ()}
+    hints = {None: (None,)}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-        wp.aimodel.compile(
-            optimizer="adam", loss="mean_squared_error",
-            metrics=['accuracy']
-        )
-        wp.hog.ok("Compiled.")
-
-        train_x, train_y = [], []
-        for x, y in getData(matchesFlow(-1000)):
-            train_x.append(x)
-            train_y.append(y)
-        train_x = tf.concat(train_x, 0)
-        train_y = tf.concat(train_y, 0)
-        wp.hog.ok("Train data has been taken.")
-        wp.hog.ok("Shuffled.")
-
-        wp.hog.info(str(train_x))
-        wp.hog.info(str(train_y))
-
-        wp.aimodel.fit(train_x, train_y, batch_size=100, epochs=16, shuffle=True)
-        wp.aimodel.save(f"Demon/Models/Mistress")
+        if cmd.args[0] not in wp.demon.modelsNames:
+            wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
+            return
+        
+        wp.hog.info(f"So, AI model {cmd.args[0]} will be fited.")
+        wp.demon.fitModel(cmd.args[0], matchesFlow())

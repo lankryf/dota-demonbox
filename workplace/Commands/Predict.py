@@ -14,8 +14,8 @@
 
 from .Common.CommandFather import *
 from tools.Supplier.types import Match, Game, DraftStr
+from tools.Termhog.types import Menu
 from workplace.Advisor import inputWithAdvice
-from Demon import predictMatch
 
 
 class Predict(Father):
@@ -25,7 +25,7 @@ class Predict(Father):
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-        menu = wp.hog.menu()
+        menu = Menu()
         drafts = []
         teamsNames = []
         teamsIds = []
@@ -47,16 +47,14 @@ class Predict(Father):
                 wp.hog.info(f"Team {draftIndex} character {characterIndex} is {name}")
                 draft.append(name)
             draft = DraftStr(draft)
-            nonExistmentDrafts = draft.checkNonExistent(wp.bar)
+            nonExistmentDrafts = draft.checkNonExistent()
             if nonExistmentDrafts:
                 wp.hog.fatal(f'Character\'s name "{nonExistmentDrafts[0]}" wasn\'t found!')
                 return
             drafts.append(draft)
-        wp.hog.space()
         match = Match([Game(drafts, 0)], 0, teamsIds)
-        predicted = predictMatch(match)[0][0]
-        match.reverse()
-        predicted = (predicted + predictMatch(match)[0][0])/2
-        wp.hog.ok(str(predicted))
-        wp.hog.proportion(*teamsNames, (1 - predicted)*100)
-        wp.hog.progressEnding()
+        predicted = wp.demon.mutualPredictMatchAllModels(match)
+        for modelName in predicted:
+            wp.hog.space()
+            wp.hog.ok(f'{modelName}: {predicted[modelName]}')
+            wp.hog.proportion(*teamsNames, (1 - predicted[modelName])*100)

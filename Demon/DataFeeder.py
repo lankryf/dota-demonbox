@@ -115,4 +115,4 @@ def getData(matches, packer=trainPacker):
         for game in match:
             drafts = draftsCategorical(game, characterMaxId)
             for packedData in packer(drafts, teams, game):
-                yield packedData 
+                yield packedData

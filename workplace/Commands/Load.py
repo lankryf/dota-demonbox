@@ -17,9 +17,9 @@ from os import path
 from keras.models import load_model
 
 
-class Switch(Father):
+class Load(Father):
 
-    flags = ()
+    flags = ('a')
     hints = {None: (), "aimodel": (None,)}
 
     @staticmethod
@@ -32,7 +32,7 @@ class Switch(Father):
         modelPath = f"{wp.config['demon']['modelsFolder']}/{cmd.args[0]}"
 
         if path.isdir(modelPath):
-            wp.aimodel = load_model(modelPath)
-            wp.hog.info(f"Now aimodel is {cmd.args[0]}")
+            wp.demon.loadModel(cmd.args[0], modelPath)
+            wp.hog.ok(f"AI model {cmd.args[0]} has been loaded.")
         else:
             wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
