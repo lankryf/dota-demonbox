@@ -17,8 +17,8 @@ from database.generators.matchesGenerator import matchesFlow
 
 class Fit(Father):
 
-    flags = ()
-    hints = {None: (None,)}
+    flags = ('b')
+    hints = {None: (None, int)}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
@@ -26,5 +26,10 @@ class Fit(Father):
             wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
             return
         
+        start = cmd.args[1]
+
+        if 'b' not in cmd.flags:
+            start = -start
+
         wp.hog.info(f"So, AI model {cmd.args[0]} will be fited.")
-        wp.demon.fitModel(cmd.args[0], matchesFlow())
+        wp.demon.fitModel(cmd.args[0], matchesFlow(start))

@@ -21,26 +21,44 @@ import keras
 
 class Make(Father):
     flags = ()
-    hints = {None: (), "aimodel": (None,)}
+    hints = {None: (), "aimodels": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
         match cmd.mode:
             case 'aimodel':
-                aimodel = keras.Sequential([
-                    Dense(1800, activation='relu', input_shape=(inputDataLen(),)),
+                inputLen = inputDataLen()
+                aimodels = {
+
+                "Little": keras.Sequential([
+                    Dense(128, activation='relu', input_shape=(inputLen,)),
+                    Dense(64, activation='sigmoid'),
+                    Dense(8, activation='sigmoid'),
+                    Dense(1, activation='sigmoid')
+                ]),
+
+                "Nerdy": keras.Sequential([
+                    Dense(560, activation='relu', input_shape=(inputLen,)),
+                    Dense(128, activation='sigmoid'),
+                    Dense(16, activation='sigmoid'),
+                    Dense(1, activation='sigmoid')
+                ]),
+
+                "Mistress": keras.Sequential([
+                    Dense(1800, activation='relu', input_shape=(inputLen,)),
                     Dense(580, activation='sigmoid'),
                     Dense(128, activation='sigmoid'),
                     Dense(1, activation='sigmoid')
                 ])
+                }
 
-                aimodel.compile(
-                    optimizer="adam", loss="mean_squared_error",
-                    metrics=['accuracy']
-                )
-
-                aimodel.save(f"Demon/Models/{cmd.args[0]}")
-                wp.hog.ok(f"Model {cmd.args[0]} has been created.")
+                for name in aimodels:
+                    aimodels[name].compile(
+                        optimizer="adam", loss="mean_squared_error",
+                        metrics=['accuracy']
+                    )
+                    aimodels[name].save(f"Demon/Models/{name}")
+                    wp.hog.ok(f"Model {name} has been created.")
 
             case _:
                 wp.hog.info("There is nothing to do :)")
