@@ -31,7 +31,7 @@ from tools.Termhog import Termhog
 from database import Databar
 
 # datareaders
-from tools.DatafilesReaders import Web, Tasks
+from tools.DatafilesReaders import Web, Tasks, Workbook
 
 # Demon
 from Demon import Demon
@@ -66,7 +66,7 @@ class Workplace(Advisor, metaclass=Singleton):
             self.hog.setTheme(jsonLoad(f))
 
         self.hog.ok("Config has been read.")
-        self.hog.ok("TermHog theme was set")
+        self.hog.ok("TermHog theme was set.")
 
         # load database
 
@@ -77,6 +77,11 @@ class Workplace(Advisor, metaclass=Singleton):
         # Data readers
         self.tasks = Tasks(self.__config["processing"]["taskFilePath"])
         self.web = Web(self.__config["web"]["webFilePath"])
+        self.workbook = Workbook(
+            self.__config["workbook"]["workbookFilePath"],
+            self.__config["demon"]["modelsFolder"]
+        )
+        self.hog.ok("Data-readers have been loaded.")
 
         self.hog.info("initialization for some demon's stuff...")
 
@@ -85,7 +90,7 @@ class Workplace(Advisor, metaclass=Singleton):
         self.demon.setup(self.__config["demon"]["modelsFolder"])
 
         self.__initCommands()
-        self.hog.done("I am ready for work!")
+        self.hog.done("I'm ready to work :)")
     
     
     @property

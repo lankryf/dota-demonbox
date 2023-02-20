@@ -14,22 +14,37 @@
 
 from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
+from tools.Termhog.types import Progressbar
 
 class Fit(Father):
 
     flags = ('b')
-    hints = {None: (None, int)}
+    hints = {None: (None, int), "workbook": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
-        if cmd.args[0] not in wp.demon.modelsNames:
-            wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
-            return
-        
-        start = cmd.args[1]
+        match cmd.mode:
+            case None:
+                if cmd.args[0] not in wp.demon.modelsNames:
+                    wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
+                    return
+                
+                start = cmd.args[1]
 
-        if 'b' not in cmd.flags:
-            start = -start
+                if 'b' not in cmd.flags:
+                    start = -start
 
-        wp.hog.info(f"So, AI model {cmd.args[0]} will be fited.")
-        wp.demon.fitModel(cmd.args[0], matchesFlow(start))
+                wp.hog.info(f"So, AI model {cmd.args[0]} will be fited.")
+                wp.demon.fitModel(cmd.args[0], matchesFlow(start))
+
+            case "workbook":
+                modelNames = wp.demon.modelsNames
+                for modelName, start in wp.workbook.fitInstructionFlow():
+                    if modelName not in modelNames:
+                        wp.hog.err(f"Model {modelName} hasn't been loaded. Passing.")
+                        continue
+
+                    wp.hog.info(f"Model {modelName} will now be fitted with start {start}")
+                    wp.demon.fitModel(modelName, matchesFlow(start))
+                
+                wp.hog.done(f"Fitting has been done.")

@@ -17,5 +17,8 @@ webFilePath = configs/web.json
 [processing]
 taskFilePath = configs/tasks.json
 
+[workbook]
+workbookFilePath = configs/workbook.json
+
 [demon]
 modelsFolder = Demon/Models

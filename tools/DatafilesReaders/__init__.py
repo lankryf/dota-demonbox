@@ -14,3 +14,4 @@
 
 from .Tasks import Tasks
 from .Web import Web
+from .Workbook import Workbook
