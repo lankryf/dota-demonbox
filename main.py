@@ -13,9 +13,6 @@
 # limitations under the License.
 
 from workplace import Workplace
-from os import environ
-
-environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
     workplace = Workplace()

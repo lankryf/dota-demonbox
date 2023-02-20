@@ -16,9 +16,8 @@ from tools.metaclasses import Singleton
 
 class Termhog(metaclass=Singleton):
     def setup(self, termhogTheme:dict) -> None:
-        screen = curses.initscr()
-        self.rows, self.cols = screen.getmaxyx()
-        self.history = []
+        self.__screen = curses.initscr()
+        self.rows, self.cols = self.__screen.getmaxyx()
         curses.noecho()
         curses.start_color()
         curses.use_default_colors()
@@ -119,6 +118,11 @@ class Termhog(metaclass=Singleton):
         win = self.wins["main"]
         win.erase()
         win.refresh()
+
+    def redraw(self):
+        self.__screen.redrawwin()
+
+
     
     def proportion(self, name1:str, name2:str, name1Percent:float|int) -> None:
         win = self.wins['main']
@@ -173,6 +177,9 @@ class Termhog(metaclass=Singleton):
             return True
         return False
 
-    def progressEnding(self):
+    def progressEnding(self, redraw=False):
         self.pressEnterTo("continue")
+        if redraw:
+            self.redraw()
+            return
         self.displayLogo()

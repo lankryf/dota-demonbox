@@ -34,5 +34,6 @@ class Load(Father):
         if path.isdir(modelPath):
             wp.demon.loadModel(cmd.args[0], modelPath)
             wp.hog.ok(f"AI model {cmd.args[0]} has been loaded.")
-        else:
-            wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
+            wp.hog.redraw()
+            return
+        wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')

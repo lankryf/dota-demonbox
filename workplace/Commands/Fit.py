@@ -14,7 +14,6 @@
 
 from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
-from tools.Termhog.types import Progressbar
 
 class Fit(Father):
 
@@ -48,3 +47,4 @@ class Fit(Father):
                     wp.demon.fitModel(modelName, matchesFlow(start))
                 
                 wp.hog.done(f"Fitting has been done.")
+        wp.hog.progressEnding(True)
