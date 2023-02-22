@@ -20,7 +20,7 @@ from configparser import ConfigParser
 from json import load as jsonLoad
 
 # for commands
-from os import listdir, path as ospath
+import os
 from importlib import import_module
 from .Advisor import Advisor
 
@@ -54,7 +54,7 @@ class Workplace(Advisor, metaclass=Singleton):
         
         # load config
         configiniPath = self.__configsPath + "/config.ini"
-        if not ospath.exists(configiniPath):
+        if not os.path.exists(configiniPath):
             self.hog.fatal(f"Config file {configiniPath} is not exsist.\nPlease, create it using config.ini.example.")
             self.hog.pressEnterTo("exit")
             raise(FileNotFoundError(configiniPath))
@@ -107,8 +107,8 @@ class Workplace(Advisor, metaclass=Singleton):
         self.__commandsNames = []
         
         folder = self.__config['commands']['folder']
-        for name in listdir(folder):
-            if ospath.isdir(f"{folder}/{name}"):
+        for name in os.listdir(folder):
+            if os.path.isdir(f"{folder}/{name}"):
                 continue
             name = name[:-3]
             lowerName = name.lower()
@@ -127,6 +127,11 @@ class Workplace(Advisor, metaclass=Singleton):
     
     def stop(self) -> None:
         self.__work = False
+    
+    def shutdown(self) -> None:
+        self.__ending()
+        os.system('systemctl poweroff -i')
+
 
     def inputLoop(self):
         while self.__work:

@@ -26,7 +26,7 @@ class Make(Father):
     @staticmethod
     def body(wp:Workplace, cmd:Command):
         match cmd.mode:
-            case 'aimodel':
+            case 'aimodels':
                 inputLen = inputDataLen()
                 aimodels = {
 
@@ -59,6 +59,6 @@ class Make(Father):
                     )
                     aimodels[name].save(f"Demon/Models/{name}")
                     wp.hog.ok(f"Model {name} has been created.")
-
+                wp.hog.redraw()
             case _:
                 wp.hog.info("There is nothing to do :)")

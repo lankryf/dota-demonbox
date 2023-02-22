@@ -14,10 +14,11 @@
 
 from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
+from os import system
 
 class Fit(Father):
 
-    flags = ('b')
+    flags = ('b', 'p')
     hints = {None: (None, int), "workbook": ()}
 
     @staticmethod
@@ -47,4 +48,8 @@ class Fit(Father):
                     wp.demon.fitModel(modelName, matchesFlow(start))
                 
                 wp.hog.done(f"Fitting has been done.")
+
+        if 'p' in cmd.flags:
+            wp.shutdown()
+            return
         wp.hog.progressEnding(True)
