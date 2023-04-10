@@ -15,6 +15,7 @@
 import torch
 import torch.nn as nn
 from tools.Termhog import Termhog
+from tools.Termhog.types import Progressbar
 
 class Teacher:
 
@@ -41,7 +42,7 @@ class Teacher:
             lossFn = cls.defaultLossFn()
         hog.info(f"Teaching model {model.__class__.__name__}.")
         loss = 'noTrainData'
-        for epoch in range(1, epochs+1):
+        for epoch in Progressbar(range(1, epochs+1), epochs, "TEACHING"):
             for inputs, outputs in dataLoader:
                 optimizer.zero_grad()
                 predicted = model(inputs)
@@ -61,7 +62,7 @@ class Teacher:
         name = model.__class__.__name__
         hog.info(f"Testing model {name}.")
         fails = 0
-        for inputs, outputs in dataset:
+        for inputs, outputs in Progressbar(dataset, len(dataset), "TESTIG"):
             if not torch.equal(predictedTransformer(model(inputs)), outputs):
                 fails += 1
         hog.info(f"Model {name} was wrong {fails}/{len(dataset)}.{' Congrats!'if not fails else ''}")

@@ -10,23 +10,25 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the Lice>nse.
 
 from .Common.CommandFather import *
 from database.generators.matchesGenerator import matchesFlow
-from Demon.DataFeeder import inputsWithGamePacker, getData
+from Demon.DataFeeder import datasetFromMachesFlow
+from Demon import Teacher
+import torch
 from tools.Termhog.types import Progressbar
 
 class Inspect(Father):
 
     flags = ('b', 'f')
-    hints = {None: (), "matches": ()}
+    hints = {None: (), "matches": (), "demon":(int,)}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
+        wp.hog.info(f"Starting inspection for {cmd.mode}.")
         match cmd.mode:
             case "matches":
-                wp.hog.info("Starting inspection for matches.")
                 errors = []
                 matchCount = wp.bar.matchCount()
                 
@@ -63,11 +65,13 @@ class Inspect(Father):
                         wp.hog.ok(f"Match {matchId} has been deleted.")
                     wp.bar.commit()
                     wp.hog.ok("Commited.")
-                wp.hog.done("Inspection has been done.")
-                wp.hog.progressEnding()
 
-            
-                
-            case _:
-                wp.hog.info("There is nothing to do :)")
-            
+            case 'demon':
+                start = cmd.args[0]
+
+                if 'b' not in cmd.flags:
+                    start = -start
+                dataset = datasetFromMachesFlow(start)
+                Teacher.test(wp.demon, dataset, torch.round)
+        wp.hog.done("Inspection has been done.")
+        wp.hog.progressEnding()

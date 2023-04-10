@@ -16,7 +16,7 @@ from .Common.CommandFather import *
 from tools.Supplier.types import Match, Game, DraftStr
 from tools.Termhog.types import Menu
 from workplace.Advisor import inputWithAdvice
-from Demon.DataFeeder import packInputs
+from Demon.DataFeeder import forOnePrediction
 
 
 class Predict(Father):
@@ -53,7 +53,7 @@ class Predict(Father):
                 wp.hog.fatal(f'Character\'s name "{nonExistmentDrafts[0]}" wasn\'t found!')
                 return
             drafts.append(draft)
-        data = packInputs(drafts, teamsIds)
-        predicted = wp.demon(data)[0][0]
+        data = forOnePrediction(drafts, teamsIds)
+        predicted = float(wp.demon(data)[0][0])
         wp.hog.ok(f'Demon: {predicted}')
         wp.hog.proportion(*teamsNames, (1 - predicted)*100)
