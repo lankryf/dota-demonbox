@@ -22,3 +22,4 @@ workbookFilePath = configs/workbook.json
 
 [demon]
 modelFolder = Demon
+numWorkers = 1

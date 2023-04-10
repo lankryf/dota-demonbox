@@ -84,12 +84,12 @@ def getData(start:int, packer=trainPacker):
             for packedData in packer(drafts, teams, game):
                 yield packedData
 
-def datasetAndLoaderFromMachesFlow(start, batchSize:int=32) -> tuple[torch.utils.data.TensorDataset, torch.utils.data.DataLoader]:
+def datasetAndLoaderFromMachesFlow(start, batchSize:int=32, numWorkers:int=1) -> tuple[torch.utils.data.TensorDataset, torch.utils.data.DataLoader]:
     dataGetter = getData(start)
     xs, ys = [], []
     for x, y in dataGetter:
         xs.append(x)
         ys.append(y)
     dataset = torch.utils.data.TensorDataset(torch.cat(xs), torch.cat(ys))
-    dataLoader = torch.utils.data.DataLoader(dataset, batch_size=batchSize, shuffle=True)
+    dataLoader = torch.utils.data.DataLoader(dataset, batch_size=batchSize, shuffle=True, num_workers=numWorkers)
     return dataset, dataLoader

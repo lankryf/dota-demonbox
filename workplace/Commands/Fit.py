@@ -26,7 +26,8 @@ class Fit(Father):
     def body(wp:Workplace, cmd:Command):
         if 'p' in cmd.flags:
             wp.hog.info("There'll be poweroff at the end.")
-
+        numWorkers = wp.config.getint('demon', 'numWorkers')
+        wp.hog.info(f"Number of workers is {numWorkers}.")
         match cmd.mode:
             case None:
 
@@ -34,20 +35,18 @@ class Fit(Father):
 
                 if 'b' not in cmd.flags:
                     start = -start
-                dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32)
+                dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32, numWorkers)
                 Teacher.teach(wp.demon, dataLoader, epochs=16)
                 Teacher.test(wp.demon, dataset, torch.round)
-                wp.saveLoader.save(wp.demon)
-                wp.hog.info(f"Demon has been saved.")
             case "workbook":
                 for start in wp.workbook.fitter:
-                    dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32)
+                    dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32, numWorkers)
                     wp.hog.info(f"Start point is {start}.")
                     Teacher.teach(wp.demon, dataLoader, epochs=10)
                     Teacher.test(wp.demon, dataset, torch.round)
                 
-                wp.saveLoader.save(wp.demon)
-                wp.hog.info(f"Demon has been saved.")
+        wp.saveLoader.save(wp.demon)
+        wp.hog.info(f"Demon has been saved.")
 
         if 'p' in cmd.flags:
             wp.shutdown()
