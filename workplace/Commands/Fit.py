@@ -13,43 +13,43 @@
 # limitations under the License.
 
 from .Common.CommandFather import *
-from database.generators.matchesGenerator import matchesFlow
-from os import system
+from Demon import Teacher
+from Demon.DataFeeder import datasetAndLoaderFromMachesFlow
+import torch
 
 class Fit(Father):
 
     flags = ('b', 'p')
-    hints = {None: (None, int), "workbook": ()}
+    hints = {None: (int,), "workbook": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
+        if 'p' in cmd.flags:
+            wp.hog.info("There'll be poweroff at the end.")
+
         match cmd.mode:
             case None:
-                if cmd.args[0] not in wp.demon.modelsNames:
-                    wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
-                    return
-                
-                start = cmd.args[1]
+
+                start = cmd.args[0]
 
                 if 'b' not in cmd.flags:
                     start = -start
-
-                wp.hog.info(f"So, AI model {cmd.args[0]} will be fited.")
-                wp.demon.fitModel(cmd.args[0], matchesFlow(start))
-
+                dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32)
+                Teacher.teach(wp.demon, dataLoader, epochs=16)
+                Teacher.test(wp.demon, dataset, torch.round)
+                wp.saveLoader.save(wp.demon)
+                wp.hog.info(f"Demon has been saved.")
             case "workbook":
-                modelNames = wp.demon.modelsNames
-                for modelName, start in wp.workbook.fitInstructionFlow():
-                    if modelName not in modelNames:
-                        wp.hog.err(f"Model {modelName} hasn't been loaded. Passing.")
-                        continue
-
-                    wp.hog.info(f"Model {modelName} will now be fitted with start {start}")
-                    wp.demon.fitModel(modelName, matchesFlow(start))
+                for start in wp.workbook.fitter:
+                    dataset, dataLoader = datasetAndLoaderFromMachesFlow(start, 32)
+                    wp.hog.info(f"Start point is {start}.")
+                    Teacher.teach(wp.demon, dataLoader, epochs=10)
+                    Teacher.test(wp.demon, dataset, torch.round)
                 
-                wp.hog.done(f"Fitting has been done.")
+                wp.saveLoader.save(wp.demon)
+                wp.hog.info(f"Demon has been saved.")
 
         if 'p' in cmd.flags:
             wp.shutdown()
             return
-        wp.hog.progressEnding(True)
+        wp.hog.progressEnding()

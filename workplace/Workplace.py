@@ -35,6 +35,8 @@ from tools.DatafilesReaders import Web, Tasks, Workbook
 
 # Demon
 from Demon import Demon
+from Demon import SaveLoader
+from Demon.DataFeeder import inputDataLen
 
 # for errors
 from traceback import format_exc
@@ -79,15 +81,15 @@ class Workplace(Advisor, metaclass=Singleton):
         self.web = Web(self.__config["web"]["webFilePath"])
         self.workbook = Workbook(
             self.__config["workbook"]["workbookFilePath"],
-            self.__config["demon"]["modelsFolder"]
         )
         self.hog.ok("Data-readers have been loaded.")
 
         self.hog.info("initialization for some demon's stuff...")
 
         # Demon
-        self.demon = Demon()
-        self.demon.setup(self.__config["demon"]["modelsFolder"])
+        self.demon = Demon(inputDataLen())
+        self.saveLoader = SaveLoader()
+        self.saveLoader.setup(self.__config["demon"]["modelFolder"])
 
         self.__initCommands()
         self.hog.done("I'm ready to work :)")

@@ -21,4 +21,4 @@ taskFilePath = configs/tasks.json
 workbookFilePath = configs/workbook.json
 
 [demon]
-modelsFolder = Demon/Models
+modelFolder = Demon

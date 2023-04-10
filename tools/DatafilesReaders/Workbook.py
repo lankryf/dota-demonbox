@@ -16,21 +16,12 @@ from .Reader import Reader
 from os import path, listdir
 
 class Workbook(Reader):
-    def __init__(self, filePath:str, modelsPath:str) -> None:
-        self.__modelsPath = modelsPath
+    def __init__(self, filePath:str) -> None:
         super().__init__(filePath)
 
     def clear(self) -> None:
         """Clears workbook
         """
         self._data = {
-            "fitter": {name:[] for name in listdir(self.__modelsPath) if path.isdir(f"{self.__modelsPath}/{name}")}
+            "fitter": []
         }
-    
-    def countFits(self) -> int:
-        return sum([len(fitInstruction) for fitInstruction in self.fitter.values()])
-    
-    def fitInstructionFlow(self):
-        return (
-            (name, start) for name in self.fitter for start in self.fitter[name]
-        )

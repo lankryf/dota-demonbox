@@ -13,3 +13,5 @@
 # limitations under the License.
 
 from .Demon import Demon
+from .SaveLoader import SaveLoader
+from .Teacher import Teacher

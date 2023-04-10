@@ -13,14 +13,12 @@
 # limitations under the License.
 
 from .Common.CommandFather import *
-from os import path
-from keras.models import load_model
 
 
 class Load(Father):
 
     flags = ('a')
-    hints = {None: (), "aimodel": (None,)}
+    hints = {None: (), "demon": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
@@ -29,11 +27,8 @@ class Load(Father):
             wp.hog.info("There is nothing to do :)")
             return
 
-        modelPath = f"{wp.config['demon']['modelsFolder']}/{cmd.args[0]}"
-
-        if path.isdir(modelPath):
-            wp.demon.loadModel(cmd.args[0], modelPath)
-            wp.hog.ok(f"AI model {cmd.args[0]} has been loaded.")
-            wp.hog.redraw()
+        if wp.saveLoader.saved(wp.demon):
+            wp.saveLoader.load(wp.demon)
+            wp.hog.ok(f"Demon has been loaded.")
             return
-        wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
+        wp.hog.fatal(f'There is no saved demon.')

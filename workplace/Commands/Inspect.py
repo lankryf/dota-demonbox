@@ -20,7 +20,7 @@ from tools.Termhog.types import Progressbar
 class Inspect(Father):
 
     flags = ('b', 'f')
-    hints = {None: (), "matches": (), "predictions": (None,)}
+    hints = {None: (), "matches": ()}
 
     @staticmethod
     def body(wp:Workplace, cmd:Command):
@@ -66,26 +66,6 @@ class Inspect(Father):
                 wp.hog.done("Inspection has been done.")
                 wp.hog.progressEnding()
 
-
-            case "predictions":
-                if cmd.args[0] not in wp.demon.modelsNames:
-                    wp.hog.fatal(f'There is no model named "{cmd.args[0]}"')
-                    return
-
-                wp.hog.info("Starting inspection for predictions.")
-                ok = 0
-                gamesCount = 0
-                for game, packed in getData(matchesFlow(-100), inputsWithGamePacker):
-                    gamesCount += 1
-                    predicted = round(wp.demon.predictWithInputs(cmd.args[0], packed))
-                    real = game.result
-                    if predicted != real:
-                        wp.hog.err(f"Wrong, predict/real: {predicted}/{real}")
-                        continue
-                    wp.hog.ok(f"Game {gamesCount} has been predicted.")
-                    ok += 1
-                    
-                wp.hog.info(f"We have {ok}/{gamesCount} games, that have been predicted correctly.")
             
                 
             case _:
