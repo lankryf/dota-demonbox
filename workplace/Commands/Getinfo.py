@@ -24,8 +24,7 @@ class Getinfo(Father):
         None: (),
         'char': ('characters_names',),
         'team': ('teams_names',),
-        'match': (int,),
-        'demon': ()
+        'match': (int,)
     }
 
     @staticmethod
@@ -44,13 +43,6 @@ class Getinfo(Father):
                 wp.hog.info(f"Match max ID is {wp.bar.matchMaxId()};")
                 wp.hog.space()
                 wp.hog.info(f"Input shape is {inputDataLen()}")
-            
-            case "demon":
-                modelsNames = wp.demon.modelsNames
-                if modelsNames:
-                    wp.hog.info(f"Loaded AI models: {' '.join(wp.demon.modelsNames)}")
-                else:
-                    wp.hog.info("No AI models.")
 
             case 'match':
                 match = matchById(cmd.args[0])

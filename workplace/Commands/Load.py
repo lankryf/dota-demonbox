@@ -17,7 +17,7 @@ from .Common.CommandFather import *
 
 class Load(Father):
 
-    flags = ('a')
+    flags = ()
     hints = {None: (), "demon": ()}
 
     @staticmethod
