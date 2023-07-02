@@ -5,9 +5,9 @@ So to use dota-demonbox just clone it to your linunx machine using
 git clone https://github.com/lankryf/dota-demonbox.git && cd dota-demonbox
 ```
 
-Then you need to make config in folder configs using
+Then you need to make config in folder "configs" using
 ```
-cp config/config.ini.example config/config.ini
+cp configs/config.ini.example configs/config.ini
 ```
 You have the ability to modify the configuration according to your specific setup.
 
